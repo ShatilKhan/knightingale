@@ -1,106 +1,439 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Knightingale — voice dictation that minds its own business</title>
-    <meta name="description" content="A minimal cross-platform voice dictation daemon. Bring your own STT key, or run Whisper locally. Single static binary, MIT licensed, no telemetry.">
-    <meta property="og:title" content="Knightingale">
-    <meta property="og:description" content="Voice dictation that minds its own business.">
-    <meta property="og:image" content="https://shatilkhan.github.io/knightingale/brand/1-social.png">
-    <meta property="og:url" content="https://shatilkhan.github.io/knightingale/">
-    <link rel="icon" type="image/png" href="brand/2-mark.png">
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-    <style>
-        :root {
-            --forest:   #1F3A2A;
-            --forest-2: #2D4A3E;
-            --sage:     #6B7A66;
-            --sage-2:   #8A9B82;
-            --cream:    #F4F1E8;
-            --cream-2:  #E8E2D0;
-            --ink:      #1A2622;
-            --moss:     #5C8052;
-            --amber:    #B8924A;
-            --coral:    #A45248;
-        }
-        * { box-sizing: border-box; }
-        html { scroll-behavior: smooth; }
-        body {
-            margin: 0;
-            background: var(--cream);
-            color: var(--ink);
-            font-family: 'Inter', system-ui, sans-serif;
-            line-height: 1.6;
-            font-size: 17px;
-        }
-        a { color: var(--forest-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
-        a:hover { color: var(--moss); }
-        code, pre { font-family: 'JetBrains Mono', ui-monospace, monospace; }
-        pre {
-            background: var(--ink);
-            color: var(--cream);
-            padding: 1.25rem 1.5rem;
-            border-radius: 4px;
-            overflow-x: auto;
-            font-size: 14px;
-            line-height: 1.55;
-        }
-        h1, h2, h3 { font-family: 'EB Garamond', Georgia, serif; color: var(--forest); font-weight: 600; letter-spacing: -0.01em; }
-        h1 { font-size: 3.5rem; margin: 0 0 0.5rem; line-height: 1.05; }
-        h2 { font-size: 2rem; margin: 4rem 0 1rem; }
-        h3 { font-size: 1.4rem; margin: 2rem 0 0.5rem; }
-        .container { max-width: 760px; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
-        header.hero { text-align: center; padding: 5rem 1.5rem 3rem; }
-        header.hero img.logo { width: 220px; height: auto; margin: 0 auto 1.5rem; display: block; }
-        .tagline { font-family: 'EB Garamond', Georgia, serif; font-size: 1.4rem; font-style: italic; color: var(--sage); margin: 0 0 2.5rem; }
-        .badge-row { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2.5rem; }
-        .badge-row img { height: 22px; }
-        .cta {
-            display: inline-block;
-            background: var(--forest);
-            color: var(--cream);
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 15px;
-            padding: 0.95rem 1.5rem;
-            border-radius: 4px;
-            text-decoration: none;
-            margin: 0.5rem;
-            transition: background 0.15s ease;
-            border: 1px solid var(--forest);
-        }
-        .cta:hover { background: var(--forest-2); color: var(--cream); }
-        .cta.secondary { background: transparent; color: var(--forest); }
-        .cta.secondary:hover { background: var(--cream-2); }
-        table { border-collapse: collapse; width: 100%; margin: 1.5rem 0; font-size: 15px; }
-        th, td { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--cream-2); text-align: left; }
-        th { color: var(--forest); font-weight: 600; }
-        td code { font-size: 0.92em; background: var(--cream-2); padding: 0.1em 0.4em; border-radius: 3px; }
-        blockquote {
-            border-left: 3px solid var(--moss);
-            padding: 0.5rem 0 0.5rem 1.5rem;
-            margin: 1.5rem 0;
-            color: var(--ink);
-            font-style: italic;
-            font-family: 'EB Garamond', Georgia, serif;
-            font-size: 1.1rem;
-        }
-        footer { text-align: center; color: var(--sage); font-size: 14px; padding: 3rem 1.5rem 4rem; border-top: 1px solid var(--cream-2); margin-top: 4rem; }
-        footer a { color: var(--sage); }
-        ul.feature-list { list-style: none; padding: 0; }
-        ul.feature-list li { padding: 0.4rem 0; padding-left: 1.5rem; position: relative; }
-        ul.feature-list li::before { content: "→"; position: absolute; left: 0; color: var(--moss); font-weight: 700; }
-        .install-os { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
-        .install-os div { background: var(--cream-2); padding: 1rem 1.25rem; border-radius: 4px; }
-        .install-os h4 { margin: 0 0 0.5rem; font-family: 'JetBrains Mono', monospace; color: var(--forest); font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
-        .install-os code { display: block; background: var(--ink); color: var(--cream); padding: 0.75rem; border-radius: 3px; font-size: 13px; white-space: nowrap; overflow-x: auto; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Knightingale — voice dictation that minds its own business</title>
+<meta name="description" content="A minimal cross-platform voice dictation daemon. Bring your own STT key, or run Whisper locally. Single static binary, MIT licensed, no telemetry.">
+<meta property="og:title" content="Knightingale">
+<meta property="og:description" content="Voice dictation that minds its own business.">
+<meta property="og:image" content="https://shatilkhan.github.io/knightingale/brand/1-social.png">
+<meta property="og:url" content="https://shatilkhan.github.io/knightingale/">
+<link rel="icon" type="image/png" href="brand/2-mark.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+    --forest:   #1F3A2A;
+    --forest-2: #2D4A3E;
+    --forest-3: #14271C;
+    --sage:     #6B7A66;
+    --sage-2:   #8A9B82;
+    --cream:    #F4F1E8;
+    --cream-2:  #E8E2D0;
+    --cream-3: #FAF8F1;
+    --ink:      #1A2622;
+    --moss:     #5C8052;
+    --moss-2:  #6E9263;
+    --amber:    #B8924A;
+    --coral:    #A45248;
+    --shadow-sm: 0 1px 2px rgba(20, 39, 28, 0.06);
+    --shadow-md: 0 4px 16px rgba(20, 39, 28, 0.08);
+    --shadow-lg: 0 12px 48px rgba(20, 39, 28, 0.12);
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+body {
+    background: var(--cream);
+    color: var(--ink);
+    font-family: 'Inter', system-ui, sans-serif;
+    line-height: 1.65;
+    font-size: 17px;
+    overflow-x: hidden;
+}
+a {
+    color: var(--forest-2);
+    text-decoration: none;
+    transition: color 0.2s var(--ease-out);
+}
+a:hover { color: var(--moss); }
+code, pre {
+    font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-feature-settings: "calt", "liga";
+}
+h1, h2, h3 {
+    font-family: 'EB Garamond', Georgia, serif;
+    color: var(--forest);
+    font-weight: 500;
+    letter-spacing: -0.015em;
+    line-height: 1.15;
+}
+
+/* Sticky header */
+.nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    padding: 0.9rem 2rem;
+    background: rgba(244, 241, 232, 0);
+    backdrop-filter: blur(0px);
+    transition: background 0.4s var(--ease-out), backdrop-filter 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
+    z-index: 100;
+    display: flex; justify-content: space-between; align-items: center;
+}
+.nav.scrolled {
+    background: rgba(244, 241, 232, 0.85);
+    backdrop-filter: blur(12px) saturate(140%);
+    box-shadow: var(--shadow-sm);
+}
+.nav .brand {
+    display: flex; align-items: center; gap: 0.6rem;
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 1.15rem;
+    color: var(--forest);
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    opacity: 0;
+    transition: opacity 0.4s var(--ease-out);
+}
+.nav.scrolled .brand { opacity: 1; }
+.nav .brand img { width: 28px; height: 28px; }
+.nav .links { display: flex; gap: 1.5rem; font-size: 14px; }
+.nav .links a { color: var(--ink); font-weight: 500; }
+.nav .links a:hover { color: var(--forest); }
+
+/* Hero */
+.hero {
+    min-height: 88vh;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 4rem 1.5rem 2rem;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+}
+.hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        radial-gradient(circle at 50% 30%, rgba(92, 128, 82, 0.05), transparent 50%),
+        radial-gradient(circle at 80% 70%, rgba(31, 58, 42, 0.04), transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+.hero > * { position: relative; z-index: 1; }
+.hero .logo-wrap {
+    margin-bottom: 1.5rem;
+    animation: float 6s ease-in-out infinite;
+}
+.hero .logo {
+    width: 240px; height: auto;
+    filter: drop-shadow(0 12px 32px rgba(20, 39, 28, 0.18));
+}
+@keyframes float {
+    0%, 100% { transform: translateY(0); }
+    50% { transform: translateY(-8px); }
+}
+.hero h1 {
+    font-size: clamp(3rem, 8vw, 5rem);
+    margin-bottom: 0.5rem;
+    letter-spacing: -0.025em;
+    background: linear-gradient(135deg, var(--forest) 0%, var(--moss) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+.tagline {
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
+    font-style: italic;
+    color: var(--sage);
+    margin-bottom: 2.5rem;
+    letter-spacing: 0.01em;
+}
+.badge-row {
+    display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
+    margin-bottom: 2.5rem;
+    max-width: 760px;
+}
+.badge-row img { height: 22px; transition: transform 0.2s var(--ease-out); }
+.badge-row a:hover img { transform: translateY(-2px); }
+.cta-row { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; }
+.cta {
+    display: inline-flex; align-items: center; gap: 0.5rem;
+    background: var(--forest);
+    color: var(--cream);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    padding: 0.95rem 1.5rem;
+    border-radius: 6px;
+    border: 1px solid var(--forest);
+    transition: all 0.25s var(--ease-out);
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+    text-decoration: none;
+}
+.cta:hover {
+    background: var(--forest-2);
+    color: var(--cream);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+.cta.secondary { background: transparent; color: var(--forest); }
+.cta.secondary:hover { background: var(--cream-2); color: var(--forest); }
+.cta svg { width: 16px; height: 16px; }
+
+/* Terminal demo */
+.terminal-section {
+    max-width: 860px;
+    margin: 0 auto;
+    padding: 3rem 1.5rem 4rem;
+}
+.terminal {
+    background: var(--forest-3);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: var(--shadow-lg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.terminal-header {
+    background: rgba(0, 0, 0, 0.25);
+    padding: 0.75rem 1rem;
+    display: flex; align-items: center; gap: 0.5rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
+.terminal-dot.red { background: #ff5f56; }
+.terminal-dot.yellow { background: #ffbd2e; }
+.terminal-dot.green { background: #27c93f; }
+.terminal-title {
+    margin-left: 0.75rem;
+    color: rgba(244, 241, 232, 0.5);
+    font-size: 12px;
+}
+.terminal-body {
+    padding: 1.5rem 1.75rem;
+    color: var(--cream);
+    line-height: 1.6;
+    min-height: 240px;
+}
+.terminal .prompt { color: var(--moss-2); font-weight: 500; }
+.terminal .cmd { color: var(--cream); }
+.terminal .out { color: var(--sage-2); display: block; padding-left: 0; }
+.terminal .accent { color: var(--moss-2); }
+.terminal .warn { color: var(--amber); }
+.cursor {
+    display: inline-block;
+    width: 8px; height: 1.1em;
+    background: var(--moss-2);
+    vertical-align: text-bottom;
+    animation: blink 1s steps(2) infinite;
+}
+@keyframes blink { 50% { opacity: 0; } }
+
+/* Sections */
+.section { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem; }
+.section.alt { background: var(--cream-2); max-width: 100%; padding: 5rem 1.5rem; }
+.section.alt .inner { max-width: 860px; margin: 0 auto; }
+.section h2 {
+    font-size: clamp(2rem, 4vw, 2.6rem);
+    margin-bottom: 0.75rem;
+    text-align: left;
+}
+.section .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    color: var(--moss);
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+.section .lead {
+    font-size: 1.1rem;
+    color: var(--sage);
+    margin-bottom: 2.5rem;
+    max-width: 60ch;
+}
+
+/* Feature grid */
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 1.5rem;
+}
+.feature {
+    background: var(--cream-3);
+    padding: 1.75rem;
+    border-radius: 8px;
+    border: 1px solid var(--cream-2);
+    transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
+}
+.feature:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow-md);
+    border-color: var(--moss);
+}
+.feature .icon {
+    width: 32px; height: 32px;
+    background: var(--forest);
+    color: var(--cream);
+    border-radius: 6px;
+    display: flex; align-items: center; justify-content: center;
+    margin-bottom: 1rem;
+    font-family: 'EB Garamond', serif;
+    font-size: 1.3rem;
+    font-weight: 700;
+}
+.feature h3 { font-size: 1.2rem; margin-bottom: 0.5rem; }
+.feature p { color: var(--sage); font-size: 15px; }
+.feature code { background: var(--cream-2); padding: 0.1em 0.4em; border-radius: 3px; font-size: 0.9em; }
+
+/* Install tabs */
+.tabs {
+    display: flex; gap: 0.25rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px solid var(--cream-2);
+}
+.tab {
+    background: transparent;
+    border: none;
+    padding: 0.65rem 1.1rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    color: var(--sage);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    margin-bottom: -1px;
+    transition: color 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+}
+.tab:hover { color: var(--forest); }
+.tab.active { color: var(--forest); border-bottom-color: var(--moss); }
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: fadeIn 0.3s var(--ease-out); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
+
+.copy-block {
+    position: relative;
+    background: var(--ink);
+    color: var(--cream);
+    padding: 1.25rem 4rem 1.25rem 1.5rem;
+    border-radius: 6px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 14px;
+    overflow-x: auto;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+.copy-block .copy-btn {
+    position: absolute;
+    top: 50%; right: 0.75rem;
+    transform: translateY(-50%);
+    background: transparent;
+    border: 1px solid rgba(244, 241, 232, 0.2);
+    color: var(--cream);
+    padding: 0.4rem 0.7rem;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+    font-family: inherit;
+    transition: all 0.2s var(--ease-out);
+}
+.copy-block .copy-btn:hover {
+    background: rgba(244, 241, 232, 0.1);
+    border-color: var(--moss-2);
+}
+.copy-block .copy-btn.copied { background: var(--moss); border-color: var(--moss); color: var(--cream); }
+
+/* Provider table */
+table { border-collapse: collapse; width: 100%; margin: 1.5rem 0; font-size: 15px; }
+th, td {
+    padding: 0.75rem 0.9rem;
+    border-bottom: 1px solid var(--cream-2);
+    text-align: left;
+    transition: background 0.2s var(--ease-out);
+}
+tr:hover td { background: var(--cream-3); }
+th { color: var(--forest); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
+td code { font-size: 0.92em; background: var(--cream-2); padding: 0.15em 0.45em; border-radius: 3px; color: var(--forest); }
+td em { color: var(--moss); font-style: normal; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+
+/* Quote */
+blockquote {
+    background: var(--forest);
+    color: var(--cream);
+    padding: 2rem 2.25rem;
+    border-radius: 8px;
+    margin: 2rem 0;
+    font-family: 'EB Garamond', Georgia, serif;
+    font-size: 1.15rem;
+    line-height: 1.55;
+    font-style: italic;
+    position: relative;
+    box-shadow: var(--shadow-md);
+}
+blockquote::before {
+    content: '"';
+    position: absolute;
+    top: -0.5rem; left: 1rem;
+    font-size: 4rem;
+    color: var(--moss-2);
+    font-style: normal;
+    line-height: 1;
+}
+blockquote strong { color: var(--moss-2); font-style: normal; }
+blockquote code { background: rgba(244, 241, 232, 0.15); padding: 0.1em 0.4em; border-radius: 3px; font-size: 0.85em; }
+
+/* Footer */
+footer {
+    text-align: center;
+    color: var(--sage);
+    font-size: 14px;
+    padding: 3.5rem 1.5rem 4rem;
+    border-top: 1px solid var(--cream-2);
+    margin-top: 4rem;
+}
+footer .bird {
+    width: 64px; height: 64px;
+    opacity: 0.6;
+    margin-bottom: 1rem;
+}
+footer a { color: var(--sage); margin: 0 0.5rem; }
+footer a:hover { color: var(--forest); }
+
+/* Reveal animation */
+.reveal {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+}
+.reveal.visible { opacity: 1; transform: translateY(0); }
+
+@media (max-width: 640px) {
+    .nav { padding: 0.75rem 1.25rem; }
+    .nav .links { gap: 0.9rem; font-size: 13px; }
+    .terminal-body { padding: 1.25rem 1.25rem; font-size: 12.5px; }
+    .copy-block { font-size: 13px; padding: 1rem 3.5rem 1rem 1rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .reveal { opacity: 1; transform: none; transition: none; }
+    .hero .logo-wrap { animation: none; }
+    .cursor { animation: none; }
+}
+</style>
 </head>
 <body>
+
+<nav class="nav" id="nav">
+    <div class="brand">
+        <img src="brand/2-mark.png" alt="">
+        <span>Knightingale</span>
+    </div>
+    <div class="links">
+        <a href="#install">Install</a>
+        <a href="#providers">Providers</a>
+        <a href="#privacy">Privacy</a>
+        <a href="https://github.com/ShatilKhan/knightingale">GitHub</a>
+    </div>
+</nav>
+
 <header class="hero">
-    <img class="logo" src="brand/1-readme.png" alt="Knightingale">
+    <div class="logo-wrap">
+        <img class="logo" src="brand/1-readme.png" alt="Knightingale">
+    </div>
     <h1>Knightingale</h1>
     <p class="tagline">Voice dictation that minds its own business.</p>
 
@@ -109,91 +442,281 @@
         <a href="https://github.com/ShatilKhan/knightingale/releases/latest"><img alt="release" src="https://img.shields.io/github/v/release/ShatilKhan/knightingale?style=flat-square&color=5C8052"></a>
         <a href="https://github.com/ShatilKhan/knightingale/actions/workflows/ci.yml"><img alt="ci" src="https://img.shields.io/github/actions/workflow/status/ShatilKhan/knightingale/ci.yml?style=flat-square"></a>
         <img alt="license" src="https://img.shields.io/github/license/ShatilKhan/knightingale?style=flat-square">
+        <img alt="hits" src="https://hits.sh/github.com/ShatilKhan/knightingale.svg?style=flat-square&color=2D4A3E">
     </div>
 
-    <a class="cta" href="#install">Install</a>
-    <a class="cta secondary" href="https://github.com/ShatilKhan/knightingale">Source</a>
+    <div class="cta-row">
+        <a class="cta" href="#install">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
+            Install
+        </a>
+        <a class="cta secondary" href="https://github.com/ShatilKhan/knightingale">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12c0 5.3 3.4 9.8 8.2 11.4.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2 1-.3 2-.4 3-.4s2 .1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6C20.6 21.8 24 17.3 24 12c0-6.6-5.4-12-12-12z"/></svg>
+            Source
+        </a>
+    </div>
 </header>
 
-<div class="container">
-
-<h2 id="install">Install</h2>
-
-<pre>curl -fsSL https://shatilkhan.github.io/knightingale/install.sh | sh</pre>
-
-<p>Then:</p>
-<pre>knightingale setup     # pick a provider, set the hotkey
-knightingale toggle    # start dictating</pre>
-
-<p>Default hotkey is <code>Super+K</code> on Linux/Windows and <code>Cmd+Shift+K</code> on macOS. Tap to start, tap again to stop and type into whatever has focus.</p>
-
-<div class="install-os">
-    <div>
-        <h4>Cargo</h4>
-        <code>cargo install knightingale</code>
+<section class="terminal-section">
+    <div class="terminal">
+        <div class="terminal-header">
+            <span class="terminal-dot red"></span>
+            <span class="terminal-dot yellow"></span>
+            <span class="terminal-dot green"></span>
+            <span class="terminal-title">knightingale demo</span>
+        </div>
+        <div class="terminal-body" id="termBody">
+            <span class="prompt">$</span> <span class="cmd" id="termCmd"></span><span class="cursor" id="termCursor"></span>
+            <span class="out" id="termOut"></span>
+        </div>
     </div>
-    <div>
-        <h4>Homebrew</h4>
-        <code>brew install &hellip;</code>
+</section>
+
+<section class="section" id="install">
+    <span class="eyebrow reveal">Install</span>
+    <h2 class="reveal">One command. No clone. No compile.</h2>
+    <p class="lead reveal">Prebuilt binaries for Linux, Windows, and macOS. SHA-256 sums signed with sigstore.</p>
+
+    <div class="reveal">
+        <div class="tabs" role="tablist">
+            <button class="tab active" data-tab="curl">curl</button>
+            <button class="tab" data-tab="cargo">cargo</button>
+            <button class="tab" data-tab="brew">brew</button>
+            <button class="tab" data-tab="scoop">scoop</button>
+        </div>
+
+        <div class="tab-content active" data-content="curl">
+            <div class="copy-block">
+                <span>curl -fsSL https://shatilkhan.github.io/knightingale/install.sh | sh</span>
+                <button class="copy-btn" data-copy="curl -fsSL https://shatilkhan.github.io/knightingale/install.sh | sh">Copy</button>
+            </div>
+        </div>
+        <div class="tab-content" data-content="cargo">
+            <div class="copy-block">
+                <span>cargo install knightingale</span>
+                <button class="copy-btn" data-copy="cargo install knightingale">Copy</button>
+            </div>
+        </div>
+        <div class="tab-content" data-content="brew">
+            <div class="copy-block">
+                <span>brew install ShatilKhan/tap/knightingale</span>
+                <button class="copy-btn" data-copy="brew install ShatilKhan/tap/knightingale">Copy</button>
+            </div>
+        </div>
+        <div class="tab-content" data-content="scoop">
+            <div class="copy-block">
+                <span>scoop install https://raw.githubusercontent.com/ShatilKhan/knightingale/main/packaging/scoop/knightingale.json</span>
+                <button class="copy-btn" data-copy="scoop install https://raw.githubusercontent.com/ShatilKhan/knightingale/main/packaging/scoop/knightingale.json">Copy</button>
+            </div>
+        </div>
     </div>
-    <div>
-        <h4>Scoop</h4>
-        <code>scoop install &hellip;</code>
+
+    <p class="lead reveal" style="margin-top: 2rem;">Then:</p>
+    <div class="copy-block reveal">
+        <span>knightingale setup && knightingale toggle</span>
+        <button class="copy-btn" data-copy="knightingale setup && knightingale toggle">Copy</button>
     </div>
-</div>
+</section>
 
-<h2>Why</h2>
+<section class="section alt">
+    <div class="inner">
+        <span class="eyebrow reveal">Why</span>
+        <h2 class="reveal">A daemon, not a desktop app.</h2>
+        <p class="lead reveal">15–30 MB binary, 10–40 MB resident memory. Hits your hotkey, captures the mic, transcribes, types. That's it.</p>
 
-<ul class="feature-list">
-    <li><strong>Tiny.</strong> ~15–30 MB binary, ~10–40 MB RAM at idle.</li>
-    <li><strong>Cross-platform.</strong> Linux, Windows, macOS — one binary per arch.</li>
-    <li><strong>Bring your own key.</strong> Eight providers share one HTTP shape: Groq, OpenAI, Deepinfra, Fireworks, Lemonfox, SambaNova, Azure, and any self-hosted OpenAI-compatible server (Speaches, LocalAI, vLLM).</li>
-    <li><strong>Local STT.</strong> Run Whisper on-device via whisper.cpp. Distil-small.en fits 4 GB VRAM laptops; large-v3-turbo on an RTX 3090 is real-time with room to spare.</li>
-    <li><strong>No telemetry.</strong> No analytics, no error reports, no phone-home. Your audio goes only to the API endpoint you configured.</li>
-</ul>
+        <div class="feature-grid">
+            <div class="feature reveal">
+                <div class="icon">∞</div>
+                <h3>Bring your own key</h3>
+                <p>Eight providers share one HTTP shape: <code>groq</code>, <code>openai</code>, <code>deepinfra</code>, <code>fireworks</code>, <code>lemonfox</code>, <code>sambanova</code>, <code>azure</code>, and any custom OpenAI-compatible server.</p>
+            </div>
+            <div class="feature reveal">
+                <div class="icon">⌖</div>
+                <h3>Or run it locally</h3>
+                <p>whisper.cpp via <code>whisper-rs</code> with <code>vulkan</code>, <code>cuda</code>, and <code>metal</code> feature flags. The <code>distil-small.en</code> default fits 4 GB VRAM laptops; <code>large-v3-turbo</code> on RTX-class is real-time.</p>
+            </div>
+            <div class="feature reveal">
+                <div class="icon">⊟</div>
+                <h3>Tiny</h3>
+                <p>Single static Rust binary. No Electron. No Chromium. No Python. The whole project is ~14k lines including the design system.</p>
+            </div>
+            <div class="feature reveal">
+                <div class="icon">⌘</div>
+                <h3>Cross-platform</h3>
+                <p>Linux (X11 + Wayland), Windows, macOS — one binary per arch. Hotkey, audio, and text injection abstracted behind <code>cpal</code>, <code>global-hotkey</code>, and <code>enigo</code>.</p>
+            </div>
+            <div class="feature reveal">
+                <div class="icon">⊘</div>
+                <h3>No telemetry</h3>
+                <p>Zero outbound calls besides the STT endpoint <em>you</em> configured. No analytics, no crash reports, no phone-home. Grep the source for <code>reqwest</code> — there's exactly one HTTP client.</p>
+            </div>
+            <div class="feature reveal">
+                <div class="icon">♢</div>
+                <h3>Smart defaults</h3>
+                <p><code>knightingale model recommend</code> reads your CPU, RAM, and GPU then picks the right Whisper checkpoint for the hardware it's running on.</p>
+            </div>
+        </div>
+    </div>
+</section>
 
-<h2>Providers</h2>
+<section class="section" id="providers">
+    <span class="eyebrow reveal">Providers</span>
+    <h2 class="reveal">Pick a cloud or stay local.</h2>
+    <p class="lead reveal">Same <code>/v1/audio/transcriptions</code> shape across the board. Swap providers by editing one env var.</p>
 
-<table>
-    <thead>
-        <tr><th>Provider</th><th>Env prefix</th><th>Default model</th></tr>
-    </thead>
-    <tbody>
-        <tr><td><code>groq</code> <em>(default)</em></td><td><code>GROQ_*</code></td><td>whisper-large-v3-turbo</td></tr>
-        <tr><td><code>openai</code></td><td><code>OPENAI_*</code></td><td>whisper-1</td></tr>
-        <tr><td><code>deepinfra</code></td><td><code>DEEPINFRA_*</code></td><td>openai/whisper-large-v3-turbo</td></tr>
-        <tr><td><code>fireworks</code></td><td><code>FIREWORKS_*</code></td><td>whisper-v3-turbo</td></tr>
-        <tr><td><code>lemonfox</code></td><td><code>LEMONFOX_*</code></td><td>whisper-1</td></tr>
-        <tr><td><code>sambanova</code></td><td><code>SAMBANOVA_*</code></td><td>Whisper-Large-v3</td></tr>
-        <tr><td><code>azure</code></td><td><code>AZURE_OPENAI_*</code></td><td>(per deployment)</td></tr>
-        <tr><td><code>custom</code></td><td><code>CUSTOM_*</code></td><td>self-hosted</td></tr>
-        <tr><td><code>local</code></td><td>—</td><td>whisper.cpp</td></tr>
-    </tbody>
-</table>
+    <table class="reveal">
+        <thead><tr><th>Provider</th><th>Env prefix</th><th>Default model</th></tr></thead>
+        <tbody>
+            <tr><td><code>groq</code> <em>default</em></td><td><code>GROQ_*</code></td><td>whisper-large-v3-turbo</td></tr>
+            <tr><td><code>openai</code></td><td><code>OPENAI_*</code></td><td>whisper-1</td></tr>
+            <tr><td><code>deepinfra</code></td><td><code>DEEPINFRA_*</code></td><td>openai/whisper-large-v3-turbo</td></tr>
+            <tr><td><code>fireworks</code></td><td><code>FIREWORKS_*</code></td><td>whisper-v3-turbo</td></tr>
+            <tr><td><code>lemonfox</code></td><td><code>LEMONFOX_*</code></td><td>whisper-1</td></tr>
+            <tr><td><code>sambanova</code></td><td><code>SAMBANOVA_*</code></td><td>Whisper-Large-v3</td></tr>
+            <tr><td><code>azure</code></td><td><code>AZURE_OPENAI_*</code></td><td>per deployment</td></tr>
+            <tr><td><code>custom</code></td><td><code>CUSTOM_*</code></td><td>self-hosted (Speaches / vLLM / LocalAI)</td></tr>
+            <tr><td><code>local</code></td><td>—</td><td>whisper.cpp on-device</td></tr>
+        </tbody>
+    </table>
+</section>
 
-<h2>Privacy</h2>
+<section class="section alt" id="privacy">
+    <div class="inner">
+        <span class="eyebrow reveal">Privacy</span>
+        <h2 class="reveal">Your audio doesn't leave the bird.</h2>
 
-<blockquote>
-Knightingale does not collect or transmit telemetry of any kind. No usage metrics, no error reports, no analytics, no phone-home. Your audio, transcripts, and configuration stay on your machine unless you explicitly point Knightingale at a cloud provider — in which case audio is sent <strong>only</strong> to the API endpoint configured in your <code>.env</code>, with your key, and nowhere else. No proxy, no cache, no logging by us.
-</blockquote>
+        <blockquote class="reveal">
+            Knightingale does not collect or transmit telemetry of any kind. No usage metrics, no error reports, no analytics, no phone-home. Your audio, transcripts, and configuration stay on your machine unless you explicitly point Knightingale at a cloud provider — in which case audio is sent <strong>only</strong> to the API endpoint configured in your <code>.env</code>, with your key, and nowhere else.
+        </blockquote>
+    </div>
+</section>
 
-<h2>Documentation</h2>
-
-<ul class="feature-list">
-    <li><a href="https://github.com/ShatilKhan/knightingale/blob/main/README.md">README</a> — full provider table, local model menu, CLI reference.</li>
-    <li><a href="https://github.com/ShatilKhan/knightingale/blob/main/docs/ARCHITECTURE.md">Architecture</a> — for contributors.</li>
-    <li><a href="https://github.com/ShatilKhan/knightingale/blob/main/LICENSE">License</a> — MIT.</li>
-</ul>
-
-</div>
+<section class="section">
+    <span class="eyebrow reveal">Documentation</span>
+    <h2 class="reveal">Read more.</h2>
+    <p class="lead reveal">The plan, decision log, and full architecture writeup live in the open.</p>
+    <div class="feature-grid reveal">
+        <a class="feature" href="https://github.com/ShatilKhan/knightingale/blob/main/README.md">
+            <div class="icon">≡</div>
+            <h3>README</h3>
+            <p>Provider table, local model menu, CLI reference, install instructions.</p>
+        </a>
+        <a class="feature" href="https://github.com/ShatilKhan/knightingale/blob/main/docs/ARCHITECTURE.md">
+            <div class="icon">◯</div>
+            <h3>Architecture</h3>
+            <p>Module-by-module tour: audio, STT, IPC, injection, hotkey, status, daemon main loop.</p>
+        </a>
+        <a class="feature" href="https://github.com/ShatilKhan/cuntxt/blob/main/knightingale/PLAN.md">
+            <div class="icon">⌥</div>
+            <h3>Plan log</h3>
+            <p>Every architectural decision, dated, with the reasoning. Open for review.</p>
+        </a>
+    </div>
+</section>
 
 <footer>
+    <img src="brand/2-mark.png" alt="" class="bird">
+    <p>© Shatil Khan · MIT licensed</p>
     <p>
-        © Shatil Khan · MIT licensed ·
-        <a href="https://github.com/ShatilKhan/knightingale">github</a> ·
-        <a href="https://github.com/ShatilKhan/knightingale/issues">issues</a>
+        <a href="https://github.com/ShatilKhan/knightingale">GitHub</a>·
+        <a href="https://github.com/ShatilKhan/knightingale/issues">Issues</a>·
+        <a href="https://github.com/ShatilKhan/knightingale/releases">Releases</a>·
+        <a href="https://shatilkhan.github.io/knightingale/install.sh">install.sh</a>
     </p>
 </footer>
 
+<script>
+// Sticky nav background on scroll
+const nav = document.getElementById('nav');
+const onScroll = () => {
+    if (window.scrollY > 60) nav.classList.add('scrolled');
+    else nav.classList.remove('scrolled');
+};
+window.addEventListener('scroll', onScroll, { passive: true });
+
+// Scroll reveal
+const io = new IntersectionObserver((entries) => {
+    for (const e of entries) {
+        if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            io.unobserve(e.target);
+        }
+    }
+}, { threshold: 0.12 });
+document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+
+// Install tabs
+document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+        const target = tab.dataset.tab;
+        document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
+        document.querySelectorAll('.tab-content').forEach(c => {
+            c.classList.toggle('active', c.dataset.content === target);
+        });
+    });
+});
+
+// Copy buttons
+document.querySelectorAll('.copy-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+        try {
+            await navigator.clipboard.writeText(btn.dataset.copy);
+            const orig = btn.textContent;
+            btn.textContent = '✓ Copied';
+            btn.classList.add('copied');
+            setTimeout(() => {
+                btn.textContent = orig;
+                btn.classList.remove('copied');
+            }, 1400);
+        } catch (e) { /* swallow */ }
+    });
+});
+
+// Terminal typewriter demo
+const cmdEl = document.getElementById('termCmd');
+const outEl = document.getElementById('termOut');
+const cursor = document.getElementById('termCursor');
+const sequence = [
+    { type: 'cmd', text: 'knightingale toggle', delay: 1100 },
+    { type: 'out', text: '<span class="warn">●</span> Recording…' , delay: 1900 },
+    { type: 'cmd', text: 'knightingale toggle', delay: 1100 },
+    { type: 'out', text: '<span class="accent">◌</span> Transcribing…', delay: 900 },
+    { type: 'out', text: '<span class="accent">✓</span> Done <span style="color:rgba(244,241,232,0.3)">(932 ms)</span>', delay: 2200 },
+];
+let idx = 0;
+function tickType(text, i, done) {
+    if (i >= text.length) { setTimeout(done, 300); return; }
+    cmdEl.textContent = text.slice(0, i + 1);
+    setTimeout(() => tickType(text, i + 1, done), 35 + Math.random() * 25);
+}
+function step() {
+    const s = sequence[idx % sequence.length];
+    if (s.type === 'cmd') {
+        cmdEl.textContent = '';
+        tickType(s.text, 0, () => {
+            setTimeout(() => {
+                outEl.innerHTML += `\n<span class="prompt">$</span> ${cmdEl.textContent}\n`;
+                cmdEl.textContent = '';
+                idx++;
+                setTimeout(step, 250);
+            }, s.delay);
+        });
+    } else {
+        outEl.innerHTML += s.text + '\n';
+        idx++;
+        if (idx >= sequence.length) {
+            setTimeout(() => {
+                outEl.innerHTML = '';
+                idx = 0;
+                step();
+            }, 3200);
+        } else {
+            setTimeout(step, s.delay);
+        }
+    }
+}
+// Kick off after a beat.
+setTimeout(step, 800);
+</script>
 </body>
 </html>
