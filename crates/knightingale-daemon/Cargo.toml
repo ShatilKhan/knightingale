@@ -1,0 +1,17 @@
+[package]
+name = "knightingale-daemon"
+description = "Knightingale background daemon."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+authors.workspace = true
+license.workspace = true
+repository.workspace = true
+homepage.workspace = true
+
+[[bin]]
+name = "knightingale-daemon"
+path = "src/main.rs"
+
+[dependencies]
+knightingale-core = { workspace = true }
