@@ -29,3 +29,5 @@ hound = "3"
 reqwest = { version = "0.12", default-features = false, features = ["blocking", "json", "multipart", "rustls-tls"] }
 enigo = "0.6"
 arboard = "3"
+interprocess = "2"
+serde_json = "1"
