@@ -1,5 +1,6 @@
 //! Knightingale core: shared library for the daemon and CLI binaries.
 
+pub mod audio;
 pub mod config;
 pub mod error;
 pub mod secret;

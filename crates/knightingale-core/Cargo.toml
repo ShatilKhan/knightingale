@@ -21,3 +21,7 @@ figment = { version = "0.10", features = ["toml", "env"] }
 directories = "6"
 secrecy = { version = "0.10", features = ["serde"] }
 dotenvy = "0.15"
+cpal = "0.16"
+rubato = "0.16"
+ringbuf = "0.4"
+tracing = "0.1"
