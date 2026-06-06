@@ -22,7 +22,10 @@ jobs:
             target: aarch64-unknown-linux-gnu
           - os: windows-latest
             target: x86_64-pc-windows-msvc
-          - os: macos-13
+          # Intel-mac runners (macos-13) are deprecated/scarce; cross-compile
+          # x86_64-apple-darwin from the arm64 runner instead — the Xcode
+          # toolchain is universal.
+          - os: macos-latest
             target: x86_64-apple-darwin
           - os: macos-latest
             target: aarch64-apple-darwin
