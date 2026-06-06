@@ -1,0 +1,16 @@
+:root {
+    --forest:   #1F3A2A;
+    --forest-2: #2D4A3E;
+    --sage:     #6B7A66;
+    --sage-2:   #8A9B82;
+    --cream:    #F4F1E8;
+    --cream-2:  #E8E2D0;
+    --ink:      #1A2622;
+    --moss:     #5C8052;
+    --amber:    #B8924A;
+    --coral:    #A45248;
+
+    --font-headline: "EB Garamond", "Lora", Georgia, serif;
+    --font-body:     "Inter", "IBM Plex Sans", system-ui, sans-serif;
+    --font-mono:     "JetBrains Mono", "IBM Plex Mono", ui-monospace, monospace;
+}

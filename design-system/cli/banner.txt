@@ -1,0 +1,3 @@
+[placeholder — generate via:
+    chafa --size=40x16 --symbols=block design-system/brand/knitingale-icon/2.png > design-system/cli/banner.txt
+]
