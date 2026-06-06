@@ -6,6 +6,7 @@ pub mod error;
 pub mod hotkey;
 pub mod injection;
 pub mod ipc;
+pub mod model;
 pub mod secret;
 pub mod status;
 pub mod stt;

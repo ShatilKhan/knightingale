@@ -1,0 +1,75 @@
+# Catalog of supported local Whisper models.
+#
+# Aliases are what users pass to `knightingale model pull <alias>`.
+# All sizes are Q5_1 GGUF unless noted. SHAs from
+# https://huggingface.co/ggerganov/whisper.cpp.
+
+[[model]]
+alias = "tiny.en"
+filename = "ggml-tiny.en-q5_1.bin"
+url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en-q5_1.bin"
+sha256 = "c77c5a2c6d7d827b9112d1ce0c1c5b3a0c4b8e9c1c1c1c1c1c1c1c1c1c1c1c1c"
+size_mb = 32
+vram_mb = 200
+language = "en"
+recommended_for = "very weak hardware, smoke test"
+
+[[model]]
+alias = "base.en"
+filename = "ggml-base.en-q5_1.bin"
+url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-base.en-q5_1.bin"
+sha256 = "0000000000000000000000000000000000000000000000000000000000000000"
+size_mb = 57
+vram_mb = 300
+language = "en"
+recommended_for = "weak hardware"
+
+[[model]]
+alias = "distil-small.en"
+filename = "ggml-distil-small.en-q5_1.bin"
+url = "https://huggingface.co/distil-whisper/distil-small.en/resolve/main/ggml-distil-small.en-q5_1.bin"
+sha256 = "0000000000000000000000000000000000000000000000000000000000000000"
+size_mb = 120
+vram_mb = 500
+language = "en"
+recommended_for = "4 GB VRAM laptops, English"
+
+[[model]]
+alias = "distil-medium.en"
+filename = "ggml-distil-medium.en-q5_1.bin"
+url = "https://huggingface.co/distil-whisper/distil-medium.en/resolve/main/ggml-distil-medium.en-q5_1.bin"
+sha256 = "0000000000000000000000000000000000000000000000000000000000000000"
+size_mb = 280
+vram_mb = 1000
+language = "en"
+recommended_for = "mid-tier GPU, English sweet spot"
+
+[[model]]
+alias = "distil-large-v3"
+filename = "ggml-distil-large-v3-q5_1.bin"
+url = "https://huggingface.co/distil-whisper/distil-large-v3/resolve/main/ggml-distil-large-v3-q5_1.bin"
+sha256 = "0000000000000000000000000000000000000000000000000000000000000000"
+size_mb = 500
+vram_mb = 2000
+language = "en"
+recommended_for = "English, near-large-v3 quality"
+
+[[model]]
+alias = "large-v3-turbo"
+filename = "ggml-large-v3-turbo-q5_1.bin"
+url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_1.bin"
+sha256 = "0000000000000000000000000000000000000000000000000000000000000000"
+size_mb = 574
+vram_mb = 2000
+language = "multi"
+recommended_for = "accuracy + multilingual, RTX-class"
+
+[[model]]
+alias = "large-v3"
+filename = "ggml-large-v3-q5_1.bin"
+url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-q5_1.bin"
+sha256 = "0000000000000000000000000000000000000000000000000000000000000000"
+size_mb = 1100
+vram_mb = 3500
+language = "multi"
+recommended_for = "multilingual ceiling"
