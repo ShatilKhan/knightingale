@@ -6,7 +6,9 @@ use std::time::Duration;
 
 use cpal::traits::{DeviceTrait, HostTrait, StreamTrait};
 use cpal::{SampleFormat, Stream};
-use rubato::{Resampler, SincFixedIn, SincInterpolationParameters, SincInterpolationType, WindowFunction};
+use rubato::{
+    Resampler, SincFixedIn, SincInterpolationParameters, SincInterpolationType, WindowFunction,
+};
 use tracing::warn;
 
 use crate::error::{KnightError, Result};
@@ -206,10 +208,7 @@ fn resample_to_16k(input: &[i16], source_rate: u32) -> Result<Vec<i16>> {
     if input.is_empty() {
         return Ok(Vec::new());
     }
-    let in_f32: Vec<f32> = input
-        .iter()
-        .map(|s| *s as f32 / i16::MAX as f32)
-        .collect();
+    let in_f32: Vec<f32> = input.iter().map(|s| *s as f32 / i16::MAX as f32).collect();
 
     let params = SincInterpolationParameters {
         sinc_len: 256,

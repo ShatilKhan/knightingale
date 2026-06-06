@@ -16,7 +16,11 @@ pub struct OpenAiClient {
 }
 
 impl OpenAiClient {
-    pub fn new(base_url: impl Into<String>, api_key: SecretString, model: impl Into<String>) -> Self {
+    pub fn new(
+        base_url: impl Into<String>,
+        api_key: SecretString,
+        model: impl Into<String>,
+    ) -> Self {
         Self {
             base_url: base_url.into().trim_end_matches('/').to_string(),
             api_key,
@@ -63,7 +67,9 @@ impl Transcriber for OpenAiClient {
         let status = resp.status();
         if !status.is_success() {
             let body = resp.text().unwrap_or_default();
-            if status == reqwest::StatusCode::UNAUTHORIZED || status == reqwest::StatusCode::FORBIDDEN {
+            if status == reqwest::StatusCode::UNAUTHORIZED
+                || status == reqwest::StatusCode::FORBIDDEN
+            {
                 return Err(KnightError::Auth(format!("{status}: {body}")));
             }
             return Err(KnightError::Network(format!("{status}: {body}")));

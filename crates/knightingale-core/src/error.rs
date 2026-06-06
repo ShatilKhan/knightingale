@@ -8,7 +8,9 @@ pub enum KnightError {
     #[error("authentication failed: {0}")]
     #[diagnostic(
         code(knightingale::auth),
-        help("check your API key with `knightingale config show` or rerun `knightingale config set-key <provider>`")
+        help(
+            "check your API key with `knightingale config show` or rerun `knightingale config set-key <provider>`"
+        )
     )]
     Auth(String),
 
@@ -22,21 +24,27 @@ pub enum KnightError {
     #[error("audio capture failed: {0}")]
     #[diagnostic(
         code(knightingale::audio),
-        help("list mic devices with `knightingale config mic list` and confirm permissions; run `knightingale doctor`")
+        help(
+            "list mic devices with `knightingale config mic list` and confirm permissions; run `knightingale doctor`"
+        )
     )]
     Audio(String),
 
     #[error("permission denied: {0}")]
     #[diagnostic(
         code(knightingale::permission),
-        help("on Linux confirm membership of the `input` group; on macOS grant Accessibility + Input Monitoring in System Settings")
+        help(
+            "on Linux confirm membership of the `input` group; on macOS grant Accessibility + Input Monitoring in System Settings"
+        )
     )]
     Permission(String),
 
     #[error("model not found: {0}")]
     #[diagnostic(
         code(knightingale::model_missing),
-        help("install with `knightingale model pull <name>` or pick a different model with `knightingale config set model <name>`")
+        help(
+            "install with `knightingale model pull <name>` or pick a different model with `knightingale config set model <name>`"
+        )
     )]
     ModelMissing(String),
 
@@ -50,7 +58,9 @@ pub enum KnightError {
     #[error("configuration error: {0}")]
     #[diagnostic(
         code(knightingale::config),
-        help("inspect with `knightingale config show` or edit `~/.config/knightingale/config.toml`")
+        help(
+            "inspect with `knightingale config show` or edit `~/.config/knightingale/config.toml`"
+        )
     )]
     Config(String),
 

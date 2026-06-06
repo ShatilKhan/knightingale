@@ -31,7 +31,9 @@ impl Response {
     }
 
     pub fn ok_msg(s: impl Into<String>) -> Self {
-        Response::Ok { message: Some(s.into()) }
+        Response::Ok {
+            message: Some(s.into()),
+        }
     }
 
     pub fn err(s: impl Into<String>) -> Self {
@@ -57,25 +59,24 @@ fn socket_name() -> Result<interprocess::local_socket::Name<'static>> {
 /// Send a single request to a running daemon and return the response.
 pub fn send(req: &Request) -> Result<Response> {
     let name = socket_name()?;
-    let stream = Stream::connect(name)
-        .map_err(|e| KnightError::Ipc(format!("connect: {e}")))?;
+    let stream = Stream::connect(name).map_err(|e| KnightError::Ipc(format!("connect: {e}")))?;
     let (rx, mut tx) = stream.split();
-    let line = serde_json::to_string(req)
-        .map_err(|e| KnightError::Ipc(format!("serialize: {e}")))?;
+    let line =
+        serde_json::to_string(req).map_err(|e| KnightError::Ipc(format!("serialize: {e}")))?;
     writeln!(tx, "{line}").map_err(|e| KnightError::Ipc(format!("write: {e}")))?;
-    tx.flush().map_err(|e| KnightError::Ipc(format!("flush: {e}")))?;
+    tx.flush()
+        .map_err(|e| KnightError::Ipc(format!("flush: {e}")))?;
     let mut reader = BufReader::new(rx);
     let mut buf = String::new();
     reader
         .read_line(&mut buf)
         .map_err(|e| KnightError::Ipc(format!("read: {e}")))?;
-    serde_json::from_str(buf.trim())
-        .map_err(|e| KnightError::Ipc(format!("parse response: {e}")))
+    serde_json::from_str(buf.trim()).map_err(|e| KnightError::Ipc(format!("parse response: {e}")))
 }
 
 /// Check whether a daemon is currently listening.
 pub fn probe() -> bool {
-    matches!(send(&Request::Status), Ok(_))
+    send(&Request::Status).is_ok()
 }
 
 /// Try to bind the IPC socket. Returns Err if another daemon is running.
@@ -133,10 +134,9 @@ pub struct Replier {
 
 impl Replier {
     pub fn reply(mut self, resp: &Response) -> Result<()> {
-        let line = serde_json::to_string(resp)
-            .map_err(|e| KnightError::Ipc(format!("serialize: {e}")))?;
-        writeln!(self.tx, "{line}")
-            .map_err(|e| KnightError::Ipc(format!("write: {e}")))?;
+        let line =
+            serde_json::to_string(resp).map_err(|e| KnightError::Ipc(format!("serialize: {e}")))?;
+        writeln!(self.tx, "{line}").map_err(|e| KnightError::Ipc(format!("write: {e}")))?;
         self.tx
             .flush()
             .map_err(|e| KnightError::Ipc(format!("flush: {e}")))?;
@@ -150,7 +150,9 @@ mod tests {
 
     #[test]
     fn request_round_trips_json() {
-        let req = Request::SetHotkey { binding: "super+k".into() };
+        let req = Request::SetHotkey {
+            binding: "super+k".into(),
+        };
         let s = serde_json::to_string(&req).unwrap();
         assert!(s.contains("set_hotkey"));
         assert!(s.contains("super+k"));

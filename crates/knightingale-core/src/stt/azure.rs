@@ -43,8 +43,8 @@ impl AzureClient {
             .map_err(|_| KnightError::Auth("AZURE_OPENAI_API_KEY not set".into()))?;
         let deployment = std::env::var("AZURE_OPENAI_DEPLOYMENT")
             .map_err(|_| KnightError::Config("AZURE_OPENAI_DEPLOYMENT not set".into()))?;
-        let api_version = std::env::var("AZURE_OPENAI_API_VERSION")
-            .unwrap_or_else(|_| "2024-06-01".to_string());
+        let api_version =
+            std::env::var("AZURE_OPENAI_API_VERSION").unwrap_or_else(|_| "2024-06-01".to_string());
         Ok(Self::new(
             endpoint,
             SecretString::from(api_key),
@@ -93,7 +93,9 @@ impl Transcriber for AzureClient {
         let status = resp.status();
         if !status.is_success() {
             let body = resp.text().unwrap_or_default();
-            if status == reqwest::StatusCode::UNAUTHORIZED || status == reqwest::StatusCode::FORBIDDEN {
+            if status == reqwest::StatusCode::UNAUTHORIZED
+                || status == reqwest::StatusCode::FORBIDDEN
+            {
                 return Err(KnightError::Auth(format!("{status}: {body}")));
             }
             return Err(KnightError::Network(format!("{status}: {body}")));

@@ -13,7 +13,7 @@ pub const APP_QUALIFIER: &str = "dev";
 pub const APP_ORGANIZATION: &str = "shatilkhan";
 pub const APP_NAME: &str = "knightingale";
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Default, Serialize, Deserialize)]
 pub struct Config {
     #[serde(default)]
     pub hotkey: HotkeyConfig,
@@ -95,17 +95,6 @@ impl Default for AudioConfig {
         Self {
             mic: None,
             silence_threshold: 500,
-        }
-    }
-}
-
-impl Default for Config {
-    fn default() -> Self {
-        Self {
-            hotkey: HotkeyConfig::default(),
-            stt: SttConfig::default(),
-            injection: InjectionConfig::default(),
-            audio: AudioConfig::default(),
         }
     }
 }

@@ -3,8 +3,8 @@ use serde::{Deserialize, Serialize};
 use crate::error::{KnightError, Result};
 use crate::secret::SecretString;
 
-use super::openai::OpenAiClient;
 use super::Transcriber;
+use super::openai::OpenAiClient;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash, Serialize, Deserialize)]
 #[serde(rename_all = "lowercase")]
@@ -102,11 +102,13 @@ impl Provider {
             Provider::Local => Ok(None),
             Provider::Azure => Ok(None),
             Provider::Custom => {
-                let base_url = std::env::var("CUSTOM_BASE_URL")
-                    .map_err(|_| KnightError::Config("CUSTOM_BASE_URL is required for custom provider".into()))?;
+                let base_url = std::env::var("CUSTOM_BASE_URL").map_err(|_| {
+                    KnightError::Config("CUSTOM_BASE_URL is required for custom provider".into())
+                })?;
                 let api_key = std::env::var("CUSTOM_API_KEY").unwrap_or_default();
-                let model = std::env::var("CUSTOM_MODEL")
-                    .map_err(|_| KnightError::Config("CUSTOM_MODEL is required for custom provider".into()))?;
+                let model = std::env::var("CUSTOM_MODEL").map_err(|_| {
+                    KnightError::Config("CUSTOM_MODEL is required for custom provider".into())
+                })?;
                 Ok(Some(OpenAiClient::new(
                     base_url,
                     SecretString::from(api_key),
@@ -154,7 +156,10 @@ mod tests {
 
     #[test]
     fn groq_defaults() {
-        assert_eq!(Provider::Groq.default_base_url().unwrap(), "https://api.groq.com/openai/v1");
+        assert_eq!(
+            Provider::Groq.default_base_url().unwrap(),
+            "https://api.groq.com/openai/v1"
+        );
         assert_eq!(Provider::Groq.default_model(), "whisper-large-v3-turbo");
         assert_eq!(Provider::Groq.env_prefix(), "GROQ");
     }

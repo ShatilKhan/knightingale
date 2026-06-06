@@ -14,8 +14,7 @@ pub fn load_env_file() -> Result<()> {
     let path = env_file()?;
     if path.exists() {
         check_permissions(&path)?;
-        dotenvy::from_path(&path)
-            .map_err(|e| KnightError::Config(format!("load .env: {e}")))?;
+        dotenvy::from_path(&path).map_err(|e| KnightError::Config(format!("load .env: {e}")))?;
     }
     Ok(())
 }
@@ -63,7 +62,14 @@ pub fn redact(secret: &str) -> String {
         return "•".repeat(len.max(4));
     }
     let prefix: String = secret.chars().take(4).collect();
-    let suffix: String = secret.chars().rev().take(2).collect::<String>().chars().rev().collect();
+    let suffix: String = secret
+        .chars()
+        .rev()
+        .take(2)
+        .collect::<String>()
+        .chars()
+        .rev()
+        .collect();
     format!("{prefix}{}{suffix}", "•".repeat(8))
 }
 

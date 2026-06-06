@@ -92,7 +92,5 @@ fn via_uinput(text: &str) -> Result<()> {
 
 #[cfg(not(target_os = "linux"))]
 fn via_uinput(_text: &str) -> Result<()> {
-    Err(KnightError::Permission(
-        "uinput is Linux-only".into(),
-    ))
+    Err(KnightError::Permission("uinput is Linux-only".into()))
 }
