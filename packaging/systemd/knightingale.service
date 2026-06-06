@@ -1,0 +1,14 @@
+[Unit]
+Description=Knightingale voice dictation daemon
+After=graphical-session.target sound.target
+PartOf=graphical-session.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/knightingale-daemon
+Restart=on-failure
+RestartSec=3
+Environment=RUST_LOG=knightingale=info
+
+[Install]
+WantedBy=graphical-session.target
