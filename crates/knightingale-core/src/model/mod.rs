@@ -57,9 +57,8 @@ pub fn is_installed(alias: &str) -> Result<bool> {
 }
 
 pub fn pull(alias: &str) -> Result<PathBuf> {
-    let model = find(alias)?.ok_or_else(|| {
-        KnightError::ModelMissing(format!("unknown model alias: {alias}"))
-    })?;
+    let model = find(alias)?
+        .ok_or_else(|| KnightError::ModelMissing(format!("unknown model alias: {alias}")))?;
     let dir = models_dir()?;
     fs::create_dir_all(&dir)?;
     let dest = local_path(&model)?;
@@ -80,7 +79,9 @@ pub fn pull(alias: &str) -> Result<PathBuf> {
     let mut hasher = Sha256::new();
     let mut buf = [0u8; 64 * 1024];
     loop {
-        let n = resp.read(&mut buf).map_err(|e| KnightError::Network(format!("read: {e}")))?;
+        let n = resp
+            .read(&mut buf)
+            .map_err(|e| KnightError::Network(format!("read: {e}")))?;
         if n == 0 {
             break;
         }
@@ -90,9 +91,7 @@ pub fn pull(alias: &str) -> Result<PathBuf> {
     file.flush()?;
     drop(file);
     let got = format!("{:x}", hasher.finalize());
-    if !model.sha256.is_empty() && model.sha256 != got
-        && !model.sha256.chars().all(|c| c == '0')
-    {
+    if !model.sha256.is_empty() && model.sha256 != got && !model.sha256.chars().all(|c| c == '0') {
         let _ = fs::remove_file(&tmp);
         return Err(KnightError::Other(format!(
             "sha256 mismatch for {}: expected {}, got {}",

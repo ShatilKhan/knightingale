@@ -37,10 +37,7 @@ impl LocalWhisper {
             .create_state()
             .map_err(|e| KnightError::Audio(format!("whisper state: {e}")))?;
         let mut params = FullParams::new(SamplingStrategy::Greedy { best_of: 1 });
-        let lang = self
-            .language
-            .as_deref()
-            .unwrap_or(language);
+        let lang = self.language.as_deref().unwrap_or(language);
         params.set_language(Some(lang));
         params.set_translate(false);
         params.set_print_realtime(false);
@@ -76,8 +73,8 @@ impl Transcriber for LocalWhisper {
 /// Parse a WAV blob (16-bit PCM mono) into f32 samples in [-1, 1].
 fn read_wav_samples(wav: &[u8]) -> Result<Vec<f32>> {
     let cursor = std::io::Cursor::new(wav);
-    let mut reader = hound::WavReader::new(cursor)
-        .map_err(|e| KnightError::Audio(format!("wav read: {e}")))?;
+    let mut reader =
+        hound::WavReader::new(cursor).map_err(|e| KnightError::Audio(format!("wav read: {e}")))?;
     let spec = reader.spec();
     if spec.channels != 1 {
         return Err(KnightError::Audio(format!(

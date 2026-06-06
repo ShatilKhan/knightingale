@@ -37,7 +37,10 @@ pub fn run_clip(
     let audio_secs = wav_duration_secs(&bytes)?;
 
     let mut sys = System::new();
-    sys.refresh_processes(sysinfo::ProcessesToUpdate::Some(&[sysinfo::Pid::from_u32(std::process::id())]), true);
+    sys.refresh_processes(
+        sysinfo::ProcessesToUpdate::Some(&[sysinfo::Pid::from_u32(std::process::id())]),
+        true,
+    );
     let baseline_rss = sys
         .process(sysinfo::Pid::from_u32(std::process::id()))
         .map(|p| p.memory() / 1024 / 1024)
@@ -47,7 +50,10 @@ pub fn run_clip(
     let hypothesis = transcriber.transcribe(&bytes, language)?;
     let processing_secs = start.elapsed().as_secs_f64();
 
-    sys.refresh_processes(sysinfo::ProcessesToUpdate::Some(&[sysinfo::Pid::from_u32(std::process::id())]), true);
+    sys.refresh_processes(
+        sysinfo::ProcessesToUpdate::Some(&[sysinfo::Pid::from_u32(std::process::id())]),
+        true,
+    );
     let peak_rss = sys
         .process(sysinfo::Pid::from_u32(std::process::id()))
         .map(|p| p.memory() / 1024 / 1024)
@@ -76,8 +82,8 @@ pub fn run_clip(
 
 fn wav_duration_secs(wav: &[u8]) -> Result<f64> {
     let cursor = std::io::Cursor::new(wav);
-    let reader = hound::WavReader::new(cursor)
-        .map_err(|e| KnightError::Audio(format!("wav: {e}")))?;
+    let reader =
+        hound::WavReader::new(cursor).map_err(|e| KnightError::Audio(format!("wav: {e}")))?;
     let spec = reader.spec();
     let samples = reader.duration() as f64;
     Ok(samples / spec.sample_rate as f64)

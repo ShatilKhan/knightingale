@@ -383,10 +383,16 @@ pub fn model_recommend(english_only: bool) -> miette::Result<()> {
     let mut header = Table::new();
     header.load_preset(UTF8_FULL);
     header.set_header(vec!["component", "detail"]);
-    header.add_row(vec!["CPU", &format!("{} ({} cores)", hw.cpu_brand, hw.cpu_cores)]);
+    header.add_row(vec![
+        "CPU",
+        &format!("{} ({} cores)", hw.cpu_brand, hw.cpu_cores),
+    ]);
     header.add_row(vec!["RAM", &format!("{} MB", hw.ram_total_mb)]);
     if let Some(g) = &hw.gpu {
-        header.add_row(vec!["GPU", &format!("{} {} ({} MB)", g.vendor, g.name, g.vram_mb)]);
+        header.add_row(vec![
+            "GPU",
+            &format!("{} {} ({} MB)", g.vendor, g.name, g.vram_mb),
+        ]);
     } else {
         header.add_row(vec!["GPU", "none detected (CPU-only)"]);
     }
@@ -420,6 +426,70 @@ pub fn model_recommend(english_only: bool) -> miette::Result<()> {
     if let Some(p) = pick {
         println!("\n→ knightingale model pull {}", p.alias);
     }
+    Ok(())
+}
+
+pub fn eval_run(corpus: std::path::PathBuf) -> miette::Result<()> {
+    use knightingale_core::eval;
+    use knightingale_core::stt::{Provider, build_transcriber};
+
+    let cfg = Config::load().map_err(miette::Report::from)?;
+    let provider = Provider::from_env();
+    let transcriber = build_transcriber(provider).map_err(miette::Report::from)?;
+
+    let entries: Vec<std::path::PathBuf> = std::fs::read_dir(&corpus)
+        .map_err(|e| miette::miette!(e.to_string()))?
+        .flatten()
+        .map(|e| e.path())
+        .filter(|p| p.extension().and_then(|e| e.to_str()) == Some("wav"))
+        .collect();
+
+    if entries.is_empty() {
+        return Err(miette::miette!("no .wav files in {}", corpus.display()));
+    }
+
+    let mut rows = Vec::new();
+    for wav in entries {
+        let txt = wav.with_extension("txt");
+        let reference = match std::fs::read_to_string(&txt) {
+            Ok(s) => s.trim().to_string(),
+            Err(_) => {
+                eprintln!("skipped {} (no matching .txt)", wav.display());
+                continue;
+            }
+        };
+        let r = eval::run_clip(&*transcriber, &wav, &reference, &cfg.stt.language)
+            .map_err(miette::Report::from)?;
+        rows.push(r);
+    }
+
+    let agg = eval::aggregate(&rows);
+
+    let mut table = Table::new();
+    table.load_preset(UTF8_FULL);
+    table.set_header(vec!["clip", "audio s", "proc s", "rtf", "wer %", "ok"]);
+    for r in &rows {
+        let name = std::path::Path::new(&r.clip)
+            .file_name()
+            .map(|n| n.to_string_lossy().to_string())
+            .unwrap_or_else(|| r.clip.clone());
+        table.add_row(vec![
+            name,
+            format!("{:.2}", r.audio_secs),
+            format!("{:.2}", r.processing_secs),
+            format!("{:.2}", r.rtf),
+            format!("{:.1}", r.wer_pct),
+            (if r.correct { "✓" } else { "✗" }).into(),
+        ]);
+    }
+    println!("{table}");
+    println!(
+        "\nprovider={} avg WER={:.1}% avg RTF={:.2} SER={:.1}%",
+        provider.as_str(),
+        agg.avg_wer_pct,
+        agg.avg_rtf,
+        agg.ser_pct
+    );
     Ok(())
 }
 

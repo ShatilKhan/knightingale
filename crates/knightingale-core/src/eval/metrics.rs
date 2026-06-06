@@ -15,9 +15,7 @@ pub fn levenshtein<T: PartialEq>(a: &[T], b: &[T]) -> usize {
         curr[0] = i;
         for j in 1..=m {
             let cost = if a[i - 1] == b[j - 1] { 0 } else { 1 };
-            curr[j] = (prev[j] + 1)
-                .min(curr[j - 1] + 1)
-                .min(prev[j - 1] + cost);
+            curr[j] = (prev[j] + 1).min(curr[j - 1] + 1).min(prev[j - 1] + cost);
         }
         std::mem::swap(&mut prev, &mut curr);
     }
@@ -51,10 +49,7 @@ pub fn ser(pairs: &[(&str, &str)]) -> f64 {
     if pairs.is_empty() {
         return 0.0;
     }
-    let wrong = pairs
-        .iter()
-        .filter(|(r, h)| r.trim() != h.trim())
-        .count();
+    let wrong = pairs.iter().filter(|(r, h)| r.trim() != h.trim()).count();
     wrong as f64 / pairs.len() as f64
 }
 

@@ -47,6 +47,15 @@ enum Cmd {
         #[command(subcommand)]
         cmd: ModelCmd,
     },
+    /// Run the eval harness against a corpus directory.
+    Eval {
+        #[arg(
+            long,
+            value_name = "DIR",
+            help = "directory with .wav and matching .txt files"
+        )]
+        corpus: std::path::PathBuf,
+    },
     /// Print the banner.
     Banner {
         #[arg(long, help = "use the wide variant")]
@@ -127,6 +136,7 @@ fn main() -> miette::Result<()> {
             ModelCmd::Pull { alias } => commands::model_pull(&alias),
             ModelCmd::Recommend { english_only } => commands::model_recommend(english_only),
         },
+        Cmd::Eval { corpus } => commands::eval_run(corpus),
         Cmd::Banner { wide } => banner(wide),
         Cmd::Config(args) => match args.cmd {
             ConfigCmd::Show => commands::config_show(),
