@@ -1,0 +1,90 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*"
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  build:
+    name: build (${{ matrix.target }})
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: ubuntu-24.04-arm
+            target: aarch64-unknown-linux-gnu
+          - os: windows-latest
+            target: x86_64-pc-windows-msvc
+          - os: macos-13
+            target: x86_64-apple-darwin
+          - os: macos-latest
+            target: aarch64-apple-darwin
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+      - uses: Swatinem/rust-cache@v2
+      - name: install linux build deps
+        if: contains(matrix.target, 'linux')
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libasound2-dev libxkbcommon-dev pkg-config
+      - run: cargo build --workspace --release --target ${{ matrix.target }}
+      - name: package tarball
+        shell: bash
+        run: |
+          mkdir -p dist
+          NAME="knightingale-${{ matrix.target }}"
+          OUT="dist/$NAME"
+          mkdir -p "$OUT"
+          if [[ "${{ matrix.target }}" == *windows* ]]; then
+            cp target/${{ matrix.target }}/release/knightingale.exe "$OUT/"
+            cp target/${{ matrix.target }}/release/knightingale-daemon.exe "$OUT/"
+          else
+            cp target/${{ matrix.target }}/release/knightingale "$OUT/"
+            cp target/${{ matrix.target }}/release/knightingale-daemon "$OUT/"
+          fi
+          cp README.md LICENSE "$OUT/"
+          tar -czf "dist/$NAME.tar.gz" -C dist "$NAME"
+          rm -rf "$OUT"
+          (cd dist && sha256sum "$NAME.tar.gz" > "$NAME.sha256")
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: dist/*
+
+  release:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+      - name: assemble release dir
+        shell: bash
+        run: |
+          mkdir -p release
+          find artifacts -type f -name "*.tar.gz" -exec cp {} release/ \;
+          (cd release && sha256sum *.tar.gz > SHA256SUMS)
+      - uses: sigstore/cosign-installer@v3
+      - name: sign sha256sums
+        env:
+          COSIGN_EXPERIMENTAL: "1"
+        run: |
+          cosign sign-blob --yes \
+            --output-signature release/SHA256SUMS.sig \
+            --output-certificate release/SHA256SUMS.pem \
+            release/SHA256SUMS
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: release/*
+          generate_release_notes: true
