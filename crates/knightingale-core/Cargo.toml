@@ -19,3 +19,5 @@ serde = { version = "1", features = ["derive"] }
 toml = "0.9"
 figment = { version = "0.10", features = ["toml", "env"] }
 directories = "6"
+secrecy = { version = "0.10", features = ["serde"] }
+dotenvy = "0.15"
