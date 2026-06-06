@@ -100,9 +100,7 @@ impl Provider {
     pub fn build_openai_client(self) -> Result<Option<OpenAiClient>> {
         match self {
             Provider::Local => Ok(None),
-            Provider::Azure => Err(KnightError::Config(
-                "azure uses a separate adapter; not yet wired".into(),
-            )),
+            Provider::Azure => Ok(None),
             Provider::Custom => {
                 let base_url = std::env::var("CUSTOM_BASE_URL")
                     .map_err(|_| KnightError::Config("CUSTOM_BASE_URL is required for custom provider".into()))?;
@@ -137,9 +135,10 @@ pub fn build_transcriber(provider: Provider) -> Result<Box<dyn Transcriber>> {
         Provider::Local => Err(KnightError::ModelMissing(
             "local backend not yet wired; configure a cloud provider for now".into(),
         )),
-        Provider::Azure => Err(KnightError::Config(
-            "azure adapter not yet wired".into(),
-        )),
+        Provider::Azure => {
+            let client = super::azure::AzureClient::from_env()?;
+            Ok(Box::new(client))
+        }
         other => {
             let client = other.build_openai_client()?.ok_or_else(|| {
                 KnightError::Config(format!("no client for provider {}", other.as_str()))

@@ -1,8 +1,10 @@
 use crate::error::Result;
 
+pub mod azure;
 pub mod openai;
 pub mod provider;
 
+pub use azure::AzureClient;
 pub use openai::OpenAiClient;
 pub use provider::{Provider, build_transcriber};
 
