@@ -238,6 +238,32 @@ fn resample_to_16k(input: &[i16], source_rate: u32) -> Result<Vec<i16>> {
     Ok(resampled)
 }
 
+/// Wrap a 16 kHz mono i16 PCM buffer in a WAV container suitable for upload to
+/// any OpenAI-compatible `/v1/audio/transcriptions` endpoint or for feeding to
+/// whisper.cpp.
+pub fn pcm_to_wav(samples: &[i16]) -> Result<Vec<u8>> {
+    let spec = hound::WavSpec {
+        channels: 1,
+        sample_rate: TARGET_SAMPLE_RATE,
+        bits_per_sample: 16,
+        sample_format: hound::SampleFormat::Int,
+    };
+    let mut out = std::io::Cursor::new(Vec::with_capacity(44 + samples.len() * 2));
+    {
+        let mut writer = hound::WavWriter::new(&mut out, spec)
+            .map_err(|e| KnightError::Audio(format!("wav writer: {e}")))?;
+        for s in samples {
+            writer
+                .write_sample(*s)
+                .map_err(|e| KnightError::Audio(format!("wav write: {e}")))?;
+        }
+        writer
+            .finalize()
+            .map_err(|e| KnightError::Audio(format!("wav finalize: {e}")))?;
+    }
+    Ok(out.into_inner())
+}
+
 /// Trim leading and trailing silence from a PCM buffer.
 ///
 /// Samples below `threshold` (absolute value) are considered silent. Cuts the
@@ -291,5 +317,13 @@ mod tests {
         let samples: Vec<i16> = vec![10, 20, 30, 40];
         let trimmed = trim_edge_silence(&samples, 100);
         assert!(trimmed.is_empty());
+    }
+
+    #[test]
+    fn wav_starts_with_riff_header() {
+        let samples = vec![0i16, 100, -100, 200, -200];
+        let wav = pcm_to_wav(&samples).unwrap();
+        assert_eq!(&wav[0..4], b"RIFF");
+        assert_eq!(&wav[8..12], b"WAVE");
     }
 }
