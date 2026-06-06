@@ -79,15 +79,26 @@ detect_pkg_mgr() {
     PKG=""
 }
 
+have_any_pkg() {
+    # True if any of the given apt package names is installed (covers t64
+    # renames on Ubuntu 24.04+).
+    for p in "$@"; do
+        dpkg -s "$p" >/dev/null 2>&1 && return 0
+    done
+    return 1
+}
+
 preflight() {
     if [ "$OS" != "linux" ]; then return 0; fi
     MISSING=""
-    for lib in libasound2 libxkbcommon0 libnotify4; do
-        case "$PKG" in
-            apt) dpkg -s "$lib" >/dev/null 2>&1 || MISSING="$MISSING $lib" ;;
-            dnf|pacman) ;;  # Best-effort; skip strict checks.
-        esac
-    done
+    case "$PKG" in
+        apt)
+            have_any_pkg libasound2 libasound2t64 || MISSING="$MISSING libasound2t64"
+            have_any_pkg libxkbcommon0 || MISSING="$MISSING libxkbcommon0"
+            have_any_pkg libnotify4 || MISSING="$MISSING libnotify4"
+            ;;
+        dnf|pacman) ;;  # Best-effort; skip strict checks.
+    esac
     if [ -n "$MISSING" ]; then
         say "Missing runtime libraries:$MISSING"
         if [ -n "$NO_SUDO" ]; then
@@ -128,27 +139,30 @@ download_binary() {
         windows-x86_64) TARGET="x86_64-pc-windows-msvc" ;;
         *) err "no prebuilt target for $OS-$ARCH"; exit 1 ;;
     esac
-    URL="https://github.com/$REPO/releases/download/$VERSION/knightingale-$TARGET.tar.gz"
+    TARBALL="knightingale-$TARGET.tar.gz"
+    URL="https://github.com/$REPO/releases/download/$VERSION/$TARBALL"
     SUMS_URL="https://github.com/$REPO/releases/download/$VERSION/SHA256SUMS"
     TMP=$(mktemp -d)
     say "downloading $URL"
-    do_or_print "curl -fsSL '$URL' -o '$TMP/binary.tar.gz'"
+    do_or_print "curl -fsSL '$URL' -o '$TMP/$TARBALL'"
     if [ "$VERIFY" = "1" ] && [ -z "$DRY_RUN" ]; then
         say "verifying SHA256SUMS"
         if curl -fsSL "$SUMS_URL" -o "$TMP/SHA256SUMS" 2>/dev/null; then
-            (cd "$TMP" && grep "knightingale-$TARGET.tar.gz" SHA256SUMS | sha256sum -c -) || {
+            (cd "$TMP" && grep "$TARBALL" SHA256SUMS | sha256sum -c -) || {
                 err "checksum mismatch"; exit 1; }
         else
             err "SHA256SUMS not found; rerun with --no-verify to skip"
             exit 1
         fi
     fi
-    do_or_print "tar -xzf '$TMP/binary.tar.gz' -C '$TMP'"
+    do_or_print "tar -xzf '$TMP/$TARBALL' -C '$TMP'"
+    # The tarball contains a knightingale-<target>/ directory.
+    SRC="$TMP/knightingale-$TARGET"
     if [ "$OS" = "linux" ] || [ "$OS" = "macos" ]; then
         DEST="$HOME/.local/bin"
         do_or_print "mkdir -p '$DEST'"
-        do_or_print "install -m 0755 '$TMP/knightingale' '$DEST/knightingale'"
-        do_or_print "install -m 0755 '$TMP/knightingale-daemon' '$DEST/knightingale-daemon'"
+        do_or_print "install -m 0755 '$SRC/knightingale' '$DEST/knightingale'"
+        do_or_print "install -m 0755 '$SRC/knightingale-daemon' '$DEST/knightingale-daemon'"
         if [ "$OS" = "macos" ]; then
             do_or_print "xattr -d com.apple.quarantine '$DEST/knightingale' 2>/dev/null || true"
             do_or_print "xattr -d com.apple.quarantine '$DEST/knightingale-daemon' 2>/dev/null || true"
@@ -156,8 +170,8 @@ download_binary() {
     else
         DEST="$LOCALAPPDATA/Programs/knightingale"
         do_or_print "mkdir -p '$DEST'"
-        do_or_print "cp '$TMP/knightingale.exe' '$DEST/'"
-        do_or_print "cp '$TMP/knightingale-daemon.exe' '$DEST/'"
+        do_or_print "cp '$SRC/knightingale.exe' '$DEST/'"
+        do_or_print "cp '$SRC/knightingale-daemon.exe' '$DEST/'"
     fi
     rm -rf "$TMP" 2>/dev/null || true
     say "✓ installed to $DEST"
