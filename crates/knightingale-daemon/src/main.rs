@@ -1,12 +1,10 @@
-#![allow(dead_code)]
-
 use std::sync::Arc;
 use std::sync::atomic::{AtomicBool, Ordering};
 use std::thread;
-use std::time::Duration;
+use std::time::{Duration, Instant};
 
-use knightingale_core::audio::{self, Recording};
-use knightingale_core::config::{Config, InjectionMethod, runtime_socket, state_dir};
+use knightingale_core::audio::{self, Recording, TARGET_SAMPLE_RATE};
+use knightingale_core::config::{Config, SttBackend, runtime_socket, state_dir};
 use knightingale_core::error::{KnightError, Result};
 use knightingale_core::hotkey::HotkeyHandle;
 use knightingale_core::injection;
@@ -14,10 +12,13 @@ use knightingale_core::ipc::{self, Listener, Replier, Request, Response};
 use knightingale_core::status::{Status, notify};
 use knightingale_core::stt::{Provider, Transcriber, build_transcriber};
 use tracing::{error, info, warn};
+use tracing_appender::rolling;
 use tracing_subscriber::EnvFilter;
+use tracing_subscriber::layer::SubscriberExt;
+use tracing_subscriber::util::SubscriberInitExt;
 
 fn main() -> miette::Result<()> {
-    init_logging();
+    let _guard = init_logging();
     knightingale_core::load_env();
 
     let cfg = Config::load().map_err(miette::Report::from)?;
@@ -34,16 +35,37 @@ fn main() -> miette::Result<()> {
     Ok(())
 }
 
-fn init_logging() {
+fn init_logging() -> Option<tracing_appender::non_blocking::WorkerGuard> {
     let filter = EnvFilter::try_from_default_env().unwrap_or_else(|_| {
         EnvFilter::new("knightingale=info,knightingale_core=info,knightingale_daemon=info")
     });
-    let _ = tracing_subscriber::fmt()
-        .with_env_filter(filter)
+
+    let stderr_layer = tracing_subscriber::fmt::layer()
         .with_target(false)
+        .with_writer(std::io::stderr);
+
+    if let Ok(dir) = state_dir() {
+        let _ = std::fs::create_dir_all(&dir);
+        let appender = rolling::daily(&dir, "daemon.log");
+        let (writer, guard) = tracing_appender::non_blocking(appender);
+        let file_layer = tracing_subscriber::fmt::layer()
+            .with_target(false)
+            .with_ansi(false)
+            .with_writer(writer);
+        let _ = tracing_subscriber::registry()
+            .with(filter)
+            .with(stderr_layer)
+            .with(file_layer)
+            .try_init();
+        install_panic_hook();
+        return Some(guard);
+    }
+    let _ = tracing_subscriber::registry()
+        .with(filter)
+        .with(stderr_layer)
         .try_init();
-    // Daemon log file writer is wired in a later commit alongside rotation.
     install_panic_hook();
+    None
 }
 
 fn install_panic_hook() {
@@ -63,7 +85,6 @@ fn install_panic_hook() {
 }
 
 fn run(cfg: Config) -> Result<()> {
-    let _state_dir = state_dir().ok();
     let _socket_path = runtime_socket()?;
     let listener = ipc::bind_listener()?;
 
@@ -96,7 +117,9 @@ fn run(cfg: Config) -> Result<()> {
                     handle_request(req, replier, &mut session, &stop);
                 }
             }
-            default(Duration::from_millis(100)) => {}
+            default(Duration::from_millis(100)) => {
+                session.tick();
+            }
         }
     }
 
@@ -146,14 +169,15 @@ fn handle_request(req: Request, replier: Replier, session: &mut Session, stop: &
     }
 }
 
+enum SessionState {
+    Idle,
+    Recording { rec: Recording, started: Instant },
+    Transcribing,
+}
+
 struct Session {
     cfg: Config,
     state: SessionState,
-}
-
-enum SessionState {
-    Idle,
-    Recording(Recording),
 }
 
 impl Session {
@@ -167,39 +191,105 @@ impl Session {
     fn status_label(&self) -> String {
         match &self.state {
             SessionState::Idle => "idle".into(),
-            SessionState::Recording(_) => "recording".into(),
+            SessionState::Recording { .. } => "recording".into(),
+            SessionState::Transcribing => "transcribing".into(),
+        }
+    }
+
+    fn tick(&mut self) {
+        // Enforce hard cap so a stuck recording doesn't burn forever.
+        if let SessionState::Recording { started, .. } = &self.state {
+            let elapsed = started.elapsed();
+            if elapsed.as_secs() >= self.cfg.stt.max_recording_secs {
+                warn!("hit hard cap; auto-stopping");
+                self.stop_and_transcribe();
+            }
         }
     }
 
     fn toggle(&mut self) {
-        // Real toggle / recording lifecycle / cap arrive in the next commit; this
-        // scaffold lets the daemon build and respond to IPC before the audio +
-        // STT pipeline is wired in.
-        info!("toggle");
-        notify(&Status::Recording);
+        match std::mem::replace(&mut self.state, SessionState::Idle) {
+            SessionState::Idle => self.start(),
+            SessionState::Recording { rec, .. } => {
+                self.state = SessionState::Recording {
+                    rec,
+                    started: Instant::now(),
+                };
+                self.stop_and_transcribe();
+            }
+            SessionState::Transcribing => {
+                // Toggle during transcribe = cancel.
+                notify(&Status::Cancelled);
+                self.state = SessionState::Idle;
+            }
+        }
+    }
+
+    fn start(&mut self) {
+        match audio::start_recording(self.cfg.audio.mic.as_deref()) {
+            Ok(rec) => {
+                notify(&Status::Recording);
+                self.state = SessionState::Recording {
+                    rec,
+                    started: Instant::now(),
+                };
+            }
+            Err(e) => {
+                warn!(error = %e, "start recording");
+                notify(&Status::Failed(format!("audio: {e}")));
+                self.state = SessionState::Idle;
+            }
+        }
+    }
+
+    fn stop_and_transcribe(&mut self) {
+        let prev = std::mem::replace(&mut self.state, SessionState::Transcribing);
+        let SessionState::Recording { rec, .. } = prev else {
+            self.state = SessionState::Idle;
+            return;
+        };
+        notify(&Status::Transcribing);
+        match rec.stop() {
+            Ok(samples) => {
+                let trimmed = audio::trim_edge_silence(&samples, self.cfg.audio.silence_threshold);
+                if trimmed.is_empty() {
+                    notify(&Status::Done);
+                    self.state = SessionState::Idle;
+                    return;
+                }
+                match self.transcribe_and_inject(trimmed) {
+                    Ok(()) => notify(&Status::Done),
+                    Err(e) => notify(&Status::Failed(e.to_string())),
+                }
+            }
+            Err(e) => notify(&Status::Failed(e.to_string())),
+        }
+        self.state = SessionState::Idle;
+    }
+
+    fn transcribe_and_inject(&self, samples: &[i16]) -> Result<()> {
+        let wav = audio::pcm_to_wav(samples)?;
+        if self.cfg.stt.backend == SttBackend::Local {
+            return Err(KnightError::ModelMissing(
+                "local backend not yet wired".into(),
+            ));
+        }
+        let provider = Provider::from_env();
+        let transcriber: Box<dyn Transcriber> = build_transcriber(provider)?;
+        let text = transcriber.transcribe(&wav, &self.cfg.stt.language)?;
+        if text.is_empty() {
+            return Ok(());
+        }
+        info!(chars = text.len(), "injecting transcript");
+        injection::inject(&text, self.cfg.injection.method)?;
+        let _ = TARGET_SAMPLE_RATE;
+        Ok(())
     }
 
     fn cancel(&mut self) {
-        if let SessionState::Recording(_) = std::mem::replace(&mut self.state, SessionState::Idle) {
+        let prev = std::mem::replace(&mut self.state, SessionState::Idle);
+        if !matches!(prev, SessionState::Idle) {
             notify(&Status::Cancelled);
         }
     }
-}
-
-// Silence unused-warning until later commits hook them up.
-#[allow(dead_code)]
-fn _unused(
-    _t: &dyn Transcriber,
-    _p: Provider,
-    _build: fn(Provider) -> Result<Box<dyn Transcriber>>,
-    _inject: fn(&str, InjectionMethod) -> Result<()>,
-    _trim: fn(&[i16], i16) -> &[i16],
-    _wav: fn(&[i16]) -> Result<Vec<u8>>,
-    _start: fn(Option<&str>) -> Result<Recording>,
-) {
-    let _ = build_transcriber;
-    let _ = injection::inject;
-    let _ = audio::trim_edge_silence;
-    let _ = audio::pcm_to_wav;
-    let _ = audio::start_recording;
 }
