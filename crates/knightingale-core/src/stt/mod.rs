@@ -5,6 +5,7 @@ pub mod azure;
 pub mod local;
 pub mod openai;
 pub mod provider;
+pub mod streaming;
 
 pub use azure::AzureClient;
 #[cfg(feature = "local-stt")]

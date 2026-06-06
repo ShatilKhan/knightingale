@@ -13,6 +13,9 @@ pub struct OpenAiClient {
     pub api_key: SecretString,
     pub model: String,
     pub timeout: Duration,
+    /// Optional `prompt` parameter — vocabulary hints prepended for
+    /// better recognition of proper nouns and jargon.
+    pub prompt: Option<String>,
 }
 
 impl OpenAiClient {
@@ -26,7 +29,13 @@ impl OpenAiClient {
             api_key,
             model: model.into(),
             timeout: Duration::from_secs(60),
+            prompt: None,
         }
+    }
+
+    pub fn with_prompt(mut self, prompt: Option<String>) -> Self {
+        self.prompt = prompt;
+        self
     }
 
     fn endpoint(&self) -> String {
@@ -46,11 +55,16 @@ impl Transcriber for OpenAiClient {
             .file_name("audio.wav")
             .mime_str("audio/wav")
             .map_err(|e| KnightError::Network(format!("mime: {e}")))?;
-        let form = reqwest::blocking::multipart::Form::new()
+        let mut form = reqwest::blocking::multipart::Form::new()
             .text("model", self.model.clone())
             .text("language", language.to_string())
             .text("response_format", "json")
             .part("file", part);
+        if let Some(prompt) = &self.prompt {
+            if !prompt.is_empty() {
+                form = form.text("prompt", prompt.clone());
+            }
+        }
 
         let client = reqwest::blocking::Client::builder()
             .timeout(self.timeout)

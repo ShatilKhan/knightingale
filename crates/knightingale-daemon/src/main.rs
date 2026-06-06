@@ -275,7 +275,21 @@ impl Session {
             ));
         }
         let provider = Provider::from_env();
-        let transcriber: Box<dyn Transcriber> = build_transcriber(provider)?;
+        let mut transcriber: Box<dyn Transcriber> = build_transcriber(provider)?;
+        // Wire vocab hints: build a prompt from global + per-app hints.
+        let prompt = knightingale_core::focus::build_prompt(
+            &self.cfg.stt.vocabulary_hints,
+            &self.cfg.stt.vocabulary_per_app,
+        );
+        if prompt.is_some() {
+            // Best-effort: the OpenAI client supports a prompt field via the
+            // builder. Other backends ignore it. We use a downcast-equivalent
+            // pattern by rebuilding the client with the prompt set.
+            if let Ok(Some(mut client)) = provider.build_openai_client() {
+                client = client.with_prompt(prompt);
+                transcriber = Box::new(client);
+            }
+        }
         let text = transcriber.transcribe(&wav, &self.cfg.stt.language)?;
         if text.is_empty() {
             return Ok(());

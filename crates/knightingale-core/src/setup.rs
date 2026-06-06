@@ -1,6 +1,7 @@
 //! OS-aware setup helpers: compositor detection, permission checks, service
 //! installation.
 
+#[cfg(any(target_os = "linux", target_os = "macos"))]
 use std::process::Command;
 
 use serde::Serialize;

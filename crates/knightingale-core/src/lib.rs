@@ -4,6 +4,7 @@ pub mod audio;
 pub mod config;
 pub mod error;
 pub mod eval;
+pub mod focus;
 pub mod hardware;
 pub mod hotkey;
 pub mod injection;

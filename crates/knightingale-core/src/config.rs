@@ -35,6 +35,19 @@ pub struct SttConfig {
     pub backend: SttBackend,
     pub language: String,
     pub max_recording_secs: u64,
+    /// Vocabulary hints prepended to the STT request as the `prompt` parameter.
+    /// Improves recognition of proper nouns, technical terms, and acronyms.
+    #[serde(default)]
+    pub vocabulary_hints: Vec<String>,
+    /// Per-app vocabulary hints, keyed by focus-window class or app name.
+    /// Looked up at recording start if focus detection is available.
+    #[serde(default)]
+    pub vocabulary_per_app: std::collections::BTreeMap<String, Vec<String>>,
+    /// Minimum average logprob for whisper-rs local STT to type the transcript.
+    /// Below this, a "low confidence" notification fires and nothing is typed.
+    /// Range: -1.0 (most lax) to 0.0 (strictest); ignored for cloud providers.
+    #[serde(default)]
+    pub confidence_threshold: Option<f32>,
 }
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
@@ -78,6 +91,9 @@ impl Default for SttConfig {
             backend: SttBackend::OpenaiCompatible,
             language: "en".to_string(),
             max_recording_secs: 300,
+            vocabulary_hints: Vec::new(),
+            vocabulary_per_app: std::collections::BTreeMap::new(),
+            confidence_threshold: None,
         }
     }
 }
