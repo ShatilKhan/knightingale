@@ -15,12 +15,34 @@ pub fn inject(text: &str, method: InjectionMethod) -> Result<()> {
 }
 
 fn auto(text: &str) -> Result<()> {
+    // On Wayland, enigo's text typing is unreliable across compositors. Prefer
+    // clipboard-paste there. Detection: WAYLAND_DISPLAY is the canonical
+    // signal on Linux.
+    if is_wayland() {
+        if let Err(e) = via_clipboard_paste(text) {
+            warn!(error = %e, "clipboard paste failed; trying enigo");
+            return via_enigo(text);
+        }
+        return Ok(());
+    }
     if let Err(e) = via_enigo(text) {
         warn!(error = %e, "enigo failed; falling back to clipboard paste");
         via_clipboard_paste(text)
     } else {
         Ok(())
     }
+}
+
+fn is_wayland() -> bool {
+    if !cfg!(target_os = "linux") {
+        return false;
+    }
+    if let Ok(val) = std::env::var("XDG_SESSION_TYPE") {
+        if val.eq_ignore_ascii_case("wayland") {
+            return true;
+        }
+    }
+    std::env::var("WAYLAND_DISPLAY").is_ok()
 }
 
 fn via_enigo(text: &str) -> Result<()> {
