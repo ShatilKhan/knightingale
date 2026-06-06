@@ -13,7 +13,7 @@
   <a href="https://github.com/ShatilKhan/knightingale/network/members"><img alt="forks" src="https://img.shields.io/github/forks/ShatilKhan/knightingale?style=flat-square&color=2D4A3E"></a>
   <a href="https://github.com/ShatilKhan/knightingale/watchers"><img alt="watchers" src="https://img.shields.io/github/watchers/ShatilKhan/knightingale?style=flat-square&color=2D4A3E"></a>
   <a href="https://github.com/ShatilKhan/knightingale/releases/latest"><img alt="release" src="https://img.shields.io/github/v/release/ShatilKhan/knightingale?style=flat-square&color=5C8052"></a>
-  <a href="https://github.com/ShatilKhan/knightingale/releases"><img alt="downloads" src="https://img.shields.io/github/downloads/ShatilKhan/knightingale/total?style=flat-square&color=5C8052"></a>
+  <a href="https://github.com/ShatilKhan/knightingale/releases"><img alt="downloads" src="https://img.shields.io/github/downloads/ShatilKhan/knightingale/total?style=flat-square&color=5C8052&cacheSeconds=3600"></a>
   <a href="https://github.com/ShatilKhan/knightingale/actions/workflows/ci.yml"><img alt="ci" src="https://img.shields.io/github/actions/workflow/status/ShatilKhan/knightingale/ci.yml?style=flat-square"></a>
   <a href="LICENSE"><img alt="license" src="https://img.shields.io/github/license/ShatilKhan/knightingale?style=flat-square"></a>
   <img alt="repo size" src="https://img.shields.io/github/repo-size/ShatilKhan/knightingale?style=flat-square">
