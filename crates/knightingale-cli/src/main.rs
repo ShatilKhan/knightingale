@@ -12,6 +12,9 @@ mod style;
     styles = style::clap_styles(),
 )]
 struct Cli {
+    /// Suppress the ASCII banner.
+    #[arg(long, global = true)]
+    no_banner: bool,
     #[command(subcommand)]
     cmd: Cmd,
 }
@@ -92,6 +95,9 @@ enum MicCmd {
 fn main() -> miette::Result<()> {
     knightingale_core::load_env();
     let cli = Cli::parse();
+    if !cli.no_banner && std::env::var("KNIGHTINGALE_NO_BANNER").is_err() {
+        eprintln!("{}", style::BANNER);
+    }
     match cli.cmd {
         Cmd::Toggle => toggle(),
         Cmd::Status => status(),
