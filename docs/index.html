@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Knightingale — voice dictation that minds its own business</title>
+    <meta name="description" content="A minimal cross-platform voice dictation daemon. Bring your own STT key, or run Whisper locally. Single static binary, MIT licensed, no telemetry.">
+    <meta property="og:title" content="Knightingale">
+    <meta property="og:description" content="Voice dictation that minds its own business.">
+    <meta property="og:image" content="https://shatilkhan.github.io/knightingale/brand/1-social.png">
+    <meta property="og:url" content="https://shatilkhan.github.io/knightingale/">
+    <link rel="icon" type="image/png" href="brand/2-mark.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --forest:   #1F3A2A;
+            --forest-2: #2D4A3E;
+            --sage:     #6B7A66;
+            --sage-2:   #8A9B82;
+            --cream:    #F4F1E8;
+            --cream-2:  #E8E2D0;
+            --ink:      #1A2622;
+            --moss:     #5C8052;
+            --amber:    #B8924A;
+            --coral:    #A45248;
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            margin: 0;
+            background: var(--cream);
+            color: var(--ink);
+            font-family: 'Inter', system-ui, sans-serif;
+            line-height: 1.6;
+            font-size: 17px;
+        }
+        a { color: var(--forest-2); text-decoration: underline; text-underline-offset: 3px; text-decoration-thickness: 1px; }
+        a:hover { color: var(--moss); }
+        code, pre { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+        pre {
+            background: var(--ink);
+            color: var(--cream);
+            padding: 1.25rem 1.5rem;
+            border-radius: 4px;
+            overflow-x: auto;
+            font-size: 14px;
+            line-height: 1.55;
+        }
+        h1, h2, h3 { font-family: 'EB Garamond', Georgia, serif; color: var(--forest); font-weight: 600; letter-spacing: -0.01em; }
+        h1 { font-size: 3.5rem; margin: 0 0 0.5rem; line-height: 1.05; }
+        h2 { font-size: 2rem; margin: 4rem 0 1rem; }
+        h3 { font-size: 1.4rem; margin: 2rem 0 0.5rem; }
+        .container { max-width: 760px; margin: 0 auto; padding: 4rem 1.5rem 6rem; }
+        header.hero { text-align: center; padding: 5rem 1.5rem 3rem; }
+        header.hero img.logo { width: 220px; height: auto; margin: 0 auto 1.5rem; display: block; }
+        .tagline { font-family: 'EB Garamond', Georgia, serif; font-size: 1.4rem; font-style: italic; color: var(--sage); margin: 0 0 2.5rem; }
+        .badge-row { display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center; margin-bottom: 2.5rem; }
+        .badge-row img { height: 22px; }
+        .cta {
+            display: inline-block;
+            background: var(--forest);
+            color: var(--cream);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 15px;
+            padding: 0.95rem 1.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            margin: 0.5rem;
+            transition: background 0.15s ease;
+            border: 1px solid var(--forest);
+        }
+        .cta:hover { background: var(--forest-2); color: var(--cream); }
+        .cta.secondary { background: transparent; color: var(--forest); }
+        .cta.secondary:hover { background: var(--cream-2); }
+        table { border-collapse: collapse; width: 100%; margin: 1.5rem 0; font-size: 15px; }
+        th, td { padding: 0.6rem 0.8rem; border-bottom: 1px solid var(--cream-2); text-align: left; }
+        th { color: var(--forest); font-weight: 600; }
+        td code { font-size: 0.92em; background: var(--cream-2); padding: 0.1em 0.4em; border-radius: 3px; }
+        blockquote {
+            border-left: 3px solid var(--moss);
+            padding: 0.5rem 0 0.5rem 1.5rem;
+            margin: 1.5rem 0;
+            color: var(--ink);
+            font-style: italic;
+            font-family: 'EB Garamond', Georgia, serif;
+            font-size: 1.1rem;
+        }
+        footer { text-align: center; color: var(--sage); font-size: 14px; padding: 3rem 1.5rem 4rem; border-top: 1px solid var(--cream-2); margin-top: 4rem; }
+        footer a { color: var(--sage); }
+        ul.feature-list { list-style: none; padding: 0; }
+        ul.feature-list li { padding: 0.4rem 0; padding-left: 1.5rem; position: relative; }
+        ul.feature-list li::before { content: "→"; position: absolute; left: 0; color: var(--moss); font-weight: 700; }
+        .install-os { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem; margin: 1.5rem 0; }
+        .install-os div { background: var(--cream-2); padding: 1rem 1.25rem; border-radius: 4px; }
+        .install-os h4 { margin: 0 0 0.5rem; font-family: 'JetBrains Mono', monospace; color: var(--forest); font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; }
+        .install-os code { display: block; background: var(--ink); color: var(--cream); padding: 0.75rem; border-radius: 3px; font-size: 13px; white-space: nowrap; overflow-x: auto; }
+    </style>
+</head>
+<body>
+<header class="hero">
+    <img class="logo" src="brand/1-readme.png" alt="Knightingale">
+    <h1>Knightingale</h1>
+    <p class="tagline">Voice dictation that minds its own business.</p>
+
+    <div class="badge-row">
+        <a href="https://github.com/ShatilKhan/knightingale/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/ShatilKhan/knightingale?style=flat-square&color=2D4A3E"></a>
+        <a href="https://github.com/ShatilKhan/knightingale/releases/latest"><img alt="release" src="https://img.shields.io/github/v/release/ShatilKhan/knightingale?style=flat-square&color=5C8052"></a>
+        <a href="https://github.com/ShatilKhan/knightingale/actions/workflows/ci.yml"><img alt="ci" src="https://img.shields.io/github/actions/workflow/status/ShatilKhan/knightingale/ci.yml?style=flat-square"></a>
+        <img alt="license" src="https://img.shields.io/github/license/ShatilKhan/knightingale?style=flat-square">
+    </div>
+
+    <a class="cta" href="#install">Install</a>
+    <a class="cta secondary" href="https://github.com/ShatilKhan/knightingale">Source</a>
+</header>
+
+<div class="container">
+
+<h2 id="install">Install</h2>
+
+<pre>curl -fsSL https://shatilkhan.github.io/knightingale/install.sh | sh</pre>
+
+<p>Then:</p>
+<pre>knightingale setup     # pick a provider, set the hotkey
+knightingale toggle    # start dictating</pre>
+
+<p>Default hotkey is <code>Super+K</code> on Linux/Windows and <code>Cmd+Shift+K</code> on macOS. Tap to start, tap again to stop and type into whatever has focus.</p>
+
+<div class="install-os">
+    <div>
+        <h4>Cargo</h4>
+        <code>cargo install knightingale</code>
+    </div>
+    <div>
+        <h4>Homebrew</h4>
+        <code>brew install &hellip;</code>
+    </div>
+    <div>
+        <h4>Scoop</h4>
+        <code>scoop install &hellip;</code>
+    </div>
+</div>
+
+<h2>Why</h2>
+
+<ul class="feature-list">
+    <li><strong>Tiny.</strong> ~15–30 MB binary, ~10–40 MB RAM at idle.</li>
+    <li><strong>Cross-platform.</strong> Linux, Windows, macOS — one binary per arch.</li>
+    <li><strong>Bring your own key.</strong> Eight providers share one HTTP shape: Groq, OpenAI, Deepinfra, Fireworks, Lemonfox, SambaNova, Azure, and any self-hosted OpenAI-compatible server (Speaches, LocalAI, vLLM).</li>
+    <li><strong>Local STT.</strong> Run Whisper on-device via whisper.cpp. Distil-small.en fits 4 GB VRAM laptops; large-v3-turbo on an RTX 3090 is real-time with room to spare.</li>
+    <li><strong>No telemetry.</strong> No analytics, no error reports, no phone-home. Your audio goes only to the API endpoint you configured.</li>
+</ul>
+
+<h2>Providers</h2>
+
+<table>
+    <thead>
+        <tr><th>Provider</th><th>Env prefix</th><th>Default model</th></tr>
+    </thead>
+    <tbody>
+        <tr><td><code>groq</code> <em>(default)</em></td><td><code>GROQ_*</code></td><td>whisper-large-v3-turbo</td></tr>
+        <tr><td><code>openai</code></td><td><code>OPENAI_*</code></td><td>whisper-1</td></tr>
+        <tr><td><code>deepinfra</code></td><td><code>DEEPINFRA_*</code></td><td>openai/whisper-large-v3-turbo</td></tr>
+        <tr><td><code>fireworks</code></td><td><code>FIREWORKS_*</code></td><td>whisper-v3-turbo</td></tr>
+        <tr><td><code>lemonfox</code></td><td><code>LEMONFOX_*</code></td><td>whisper-1</td></tr>
+        <tr><td><code>sambanova</code></td><td><code>SAMBANOVA_*</code></td><td>Whisper-Large-v3</td></tr>
+        <tr><td><code>azure</code></td><td><code>AZURE_OPENAI_*</code></td><td>(per deployment)</td></tr>
+        <tr><td><code>custom</code></td><td><code>CUSTOM_*</code></td><td>self-hosted</td></tr>
+        <tr><td><code>local</code></td><td>—</td><td>whisper.cpp</td></tr>
+    </tbody>
+</table>
+
+<h2>Privacy</h2>
+
+<blockquote>
+Knightingale does not collect or transmit telemetry of any kind. No usage metrics, no error reports, no analytics, no phone-home. Your audio, transcripts, and configuration stay on your machine unless you explicitly point Knightingale at a cloud provider — in which case audio is sent <strong>only</strong> to the API endpoint configured in your <code>.env</code>, with your key, and nowhere else. No proxy, no cache, no logging by us.
+</blockquote>
+
+<h2>Documentation</h2>
+
+<ul class="feature-list">
+    <li><a href="https://github.com/ShatilKhan/knightingale/blob/main/README.md">README</a> — full provider table, local model menu, CLI reference.</li>
+    <li><a href="https://github.com/ShatilKhan/knightingale/blob/main/docs/ARCHITECTURE.md">Architecture</a> — for contributors.</li>
+    <li><a href="https://github.com/ShatilKhan/knightingale/blob/main/LICENSE">License</a> — MIT.</li>
+</ul>
+
+</div>
+
+<footer>
+    <p>
+        © Shatil Khan · MIT licensed ·
+        <a href="https://github.com/ShatilKhan/knightingale">github</a> ·
+        <a href="https://github.com/ShatilKhan/knightingale/issues">issues</a>
+    </p>
+</footer>
+
+</body>
+</html>
