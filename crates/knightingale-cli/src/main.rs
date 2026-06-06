@@ -104,8 +104,8 @@ enum ProviderCmd {
 enum ModelCmd {
     /// List installed + available local models.
     List,
-    /// Download a model by alias.
-    Pull { alias: String },
+    /// Print the download command for a model alias.
+    Where { alias: String },
     /// Print the recommended model for this machine.
     Recommend {
         #[arg(long)]
@@ -133,7 +133,7 @@ fn main() -> miette::Result<()> {
         Cmd::Setup => commands::setup(),
         Cmd::Model { cmd } => match cmd {
             ModelCmd::List => commands::model_list(),
-            ModelCmd::Pull { alias } => commands::model_pull(&alias),
+            ModelCmd::Where { alias } => commands::model_where(&alias),
             ModelCmd::Recommend { english_only } => commands::model_recommend(english_only),
         },
         Cmd::Eval { corpus } => commands::eval_run(corpus),

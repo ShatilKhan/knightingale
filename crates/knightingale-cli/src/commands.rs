@@ -414,10 +414,10 @@ pub fn model_list() -> miette::Result<()> {
     Ok(())
 }
 
-pub fn model_pull(alias: &str) -> miette::Result<()> {
-    eprintln!("pulling {alias} …");
-    let path = model::pull(alias).map_err(miette::Report::from)?;
-    println!("✓ {alias} installed at {}", path.display());
+pub fn model_where(alias: &str) -> miette::Result<()> {
+    let cmd = model::download_command(alias).map_err(miette::Report::from)?;
+    println!("# Download {alias}, then set KNIGHTINGALE_MODEL_PATH to the result.");
+    println!("{cmd}");
     Ok(())
 }
 
@@ -470,7 +470,10 @@ pub fn model_recommend(english_only: bool) -> miette::Result<()> {
     }
     println!("{rows}");
     if let Some(p) = pick {
-        println!("\n→ knightingale model pull {}", p.alias);
+        println!("\n→ knightingale model where {}", p.alias);
+        if let Ok(cmd) = model::download_command(&p.alias) {
+            println!("   ({cmd})");
+        }
     }
     Ok(())
 }

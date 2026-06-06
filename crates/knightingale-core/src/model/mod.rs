@@ -1,9 +1,6 @@
-use std::fs;
-use std::io::{Read, Write};
 use std::path::PathBuf;
 
 use serde::{Deserialize, Serialize};
-use sha2::{Digest, Sha256};
 
 use crate::config::cache_dir;
 use crate::error::{KnightError, Result};
@@ -15,7 +12,6 @@ pub struct Model {
     pub alias: String,
     pub filename: String,
     pub url: String,
-    pub sha256: String,
     pub size_mb: u32,
     pub vram_mb: u32,
     pub language: String,
@@ -56,48 +52,21 @@ pub fn is_installed(alias: &str) -> Result<bool> {
     }
 }
 
-pub fn pull(alias: &str) -> Result<PathBuf> {
+/// Shell command the user can run to download a model.
+///
+/// Knightingale deliberately does not auto-download Whisper checkpoints —
+/// that's the job of a model manager like Ollama. This returns the canonical
+/// curl one-liner; the user runs it once and points
+/// `KNIGHTINGALE_MODEL_PATH` at the result.
+pub fn download_command(alias: &str) -> Result<String> {
     let model = find(alias)?
         .ok_or_else(|| KnightError::ModelMissing(format!("unknown model alias: {alias}")))?;
     let dir = models_dir()?;
-    fs::create_dir_all(&dir)?;
     let dest = local_path(&model)?;
-    if dest.exists() {
-        return Ok(dest);
-    }
-    let mut resp = reqwest::blocking::get(&model.url)
-        .map_err(|e| KnightError::Network(format!("download: {e}")))?;
-    if !resp.status().is_success() {
-        return Err(KnightError::Network(format!(
-            "download {}: HTTP {}",
-            model.alias,
-            resp.status()
-        )));
-    }
-    let tmp = dest.with_extension("partial");
-    let mut file = fs::File::create(&tmp)?;
-    let mut hasher = Sha256::new();
-    let mut buf = [0u8; 64 * 1024];
-    loop {
-        let n = resp
-            .read(&mut buf)
-            .map_err(|e| KnightError::Network(format!("read: {e}")))?;
-        if n == 0 {
-            break;
-        }
-        hasher.update(&buf[..n]);
-        file.write_all(&buf[..n])?;
-    }
-    file.flush()?;
-    drop(file);
-    let got = format!("{:x}", hasher.finalize());
-    if !model.sha256.is_empty() && model.sha256 != got && !model.sha256.chars().all(|c| c == '0') {
-        let _ = fs::remove_file(&tmp);
-        return Err(KnightError::Other(format!(
-            "sha256 mismatch for {}: expected {}, got {}",
-            model.alias, model.sha256, got
-        )));
-    }
-    fs::rename(&tmp, &dest)?;
-    Ok(dest)
+    Ok(format!(
+        "mkdir -p {dir} && curl -fL '{url}' -o '{dest}'",
+        dir = dir.display(),
+        url = model.url,
+        dest = dest.display()
+    ))
 }
