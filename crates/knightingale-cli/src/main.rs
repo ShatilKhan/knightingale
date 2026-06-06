@@ -42,6 +42,11 @@ enum Cmd {
     Doctor,
     /// Re-run the interactive setup flow.
     Setup,
+    /// Manage local Whisper models.
+    Model {
+        #[command(subcommand)]
+        cmd: ModelCmd,
+    },
     /// Print the banner.
     Banner {
         #[arg(long, help = "use the wide variant")]
@@ -87,6 +92,19 @@ enum ProviderCmd {
 }
 
 #[derive(Subcommand)]
+enum ModelCmd {
+    /// List installed + available local models.
+    List,
+    /// Download a model by alias.
+    Pull { alias: String },
+    /// Print the recommended model for this machine.
+    Recommend {
+        #[arg(long)]
+        english_only: bool,
+    },
+}
+
+#[derive(Subcommand)]
 enum MicCmd {
     List,
     Set { name: String },
@@ -104,6 +122,11 @@ fn main() -> miette::Result<()> {
         Cmd::Logs { since, path } => commands::logs(since, path),
         Cmd::Doctor => commands::doctor(),
         Cmd::Setup => commands::setup(),
+        Cmd::Model { cmd } => match cmd {
+            ModelCmd::List => commands::model_list(),
+            ModelCmd::Pull { alias } => commands::model_pull(&alias),
+            ModelCmd::Recommend { english_only } => commands::model_recommend(english_only),
+        },
         Cmd::Banner { wide } => banner(wide),
         Cmd::Config(args) => match args.cmd {
             ConfigCmd::Show => commands::config_show(),

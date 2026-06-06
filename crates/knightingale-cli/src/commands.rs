@@ -6,6 +6,8 @@ use inquire::{Confirm, Password, PasswordDisplayMode, Select, Text};
 use knightingale_core::audio;
 use knightingale_core::config::{Config, SttBackend, config_file, env_file};
 use knightingale_core::error::KnightError;
+use knightingale_core::hardware;
+use knightingale_core::model::{self, Model};
 use knightingale_core::secret::{SecretString, redact, set_in_env_file};
 use knightingale_core::stt::Provider;
 
@@ -336,6 +338,88 @@ pub fn config_set(key: String, value: String) -> miette::Result<()> {
         other => return Err(miette::miette!("unknown key: {other}")),
     }
     cfg.save().map_err(miette::Report::from)?;
+    Ok(())
+}
+
+pub fn model_list() -> miette::Result<()> {
+    let cat = model::catalog().map_err(miette::Report::from)?;
+    let mut table = Table::new();
+    table.load_preset(UTF8_FULL);
+    table.set_header(vec![
+        "alias",
+        "disk",
+        "vram",
+        "lang",
+        "installed",
+        "best for",
+    ]);
+    for m in &cat {
+        let installed = model::is_installed(&m.alias).unwrap_or(false);
+        table.add_row(vec![
+            m.alias.clone(),
+            format!("{} MB", m.size_mb),
+            format!("{} MB", m.vram_mb),
+            m.language.clone(),
+            (if installed { "yes" } else { "no" }).into(),
+            m.recommended_for.clone(),
+        ]);
+    }
+    println!("{table}");
+    Ok(())
+}
+
+pub fn model_pull(alias: &str) -> miette::Result<()> {
+    eprintln!("pulling {alias} …");
+    let path = model::pull(alias).map_err(miette::Report::from)?;
+    println!("✓ {alias} installed at {}", path.display());
+    Ok(())
+}
+
+pub fn model_recommend(english_only: bool) -> miette::Result<()> {
+    let hw = hardware::detect();
+    let cat = model::catalog().map_err(miette::Report::from)?;
+    let pick: Option<&Model> = hardware::recommend(&hw, &cat, english_only);
+
+    let mut header = Table::new();
+    header.load_preset(UTF8_FULL);
+    header.set_header(vec!["component", "detail"]);
+    header.add_row(vec!["CPU", &format!("{} ({} cores)", hw.cpu_brand, hw.cpu_cores)]);
+    header.add_row(vec!["RAM", &format!("{} MB", hw.ram_total_mb)]);
+    if let Some(g) = &hw.gpu {
+        header.add_row(vec!["GPU", &format!("{} {} ({} MB)", g.vendor, g.name, g.vram_mb)]);
+    } else {
+        header.add_row(vec!["GPU", "none detected (CPU-only)"]);
+    }
+    println!("{header}");
+
+    let mut rows = Table::new();
+    rows.load_preset(UTF8_FULL);
+    rows.set_header(vec!["alias", "disk", "vram", "note"]);
+    for m in &cat {
+        let fits_gpu = hw
+            .gpu
+            .as_ref()
+            .map(|g| (m.vram_mb as u64) * 2 <= g.vram_mb)
+            .unwrap_or(false);
+        let fits_cpu = (m.size_mb as u64) * 4 <= hw.ram_total_mb;
+        let fits = fits_gpu || (hw.gpu.is_none() && fits_cpu);
+        let recommended = pick.map(|p| p.alias == m.alias).unwrap_or(false);
+        let note = match (recommended, fits) {
+            (true, _) => format!("Recommended — {}", m.recommended_for),
+            (false, true) => m.recommended_for.clone(),
+            (false, false) => "⚠ exceeds VRAM headroom".into(),
+        };
+        rows.add_row(vec![
+            m.alias.clone(),
+            format!("{} MB", m.size_mb),
+            format!("{} MB", m.vram_mb),
+            note,
+        ]);
+    }
+    println!("{rows}");
+    if let Some(p) = pick {
+        println!("\n→ knightingale model pull {}", p.alias);
+    }
     Ok(())
 }
 
