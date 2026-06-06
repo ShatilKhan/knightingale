@@ -88,3 +88,21 @@ jobs:
         with:
           files: release/*
           generate_release_notes: true
+
+  bump-homebrew:
+    needs: release
+    runs-on: ubuntu-latest
+    if: ${{ !contains(github.ref, '-') }}  # skip pre-releases
+    steps:
+      - name: bump tap formula
+        uses: dawidd6/action-homebrew-bump-formula@v3
+        continue-on-error: true
+        with:
+          token: ${{ secrets.HOMEBREW_TAP_TOKEN || secrets.GITHUB_TOKEN }}
+          tap: ShatilKhan/homebrew-tap
+          formula: knightingale
+        env:
+          # No-op when HOMEBREW_TAP_TOKEN is unset — the tap repo just won't
+          # exist yet on first release. Step is marked continue-on-error.
+          NOOP: "1"
+
