@@ -1,0 +1,28 @@
+{
+    "version": "0.1.0",
+    "description": "Voice dictation daemon that minds its own business",
+    "homepage": "https://shatilkhan.github.io/knightingale/",
+    "license": "MIT",
+    "architecture": {
+        "64bit": {
+            "url": "https://github.com/ShatilKhan/knightingale/releases/download/v0.1.0/knightingale-x86_64-pc-windows-msvc.tar.gz",
+            "hash": "0000000000000000000000000000000000000000000000000000000000000000",
+            "extract_dir": "knightingale-x86_64-pc-windows-msvc"
+        }
+    },
+    "bin": [
+        "knightingale.exe",
+        "knightingale-daemon.exe"
+    ],
+    "post_install": [
+        "knightingale --version | Out-Host"
+    ],
+    "checkver": "github",
+    "autoupdate": {
+        "architecture": {
+            "64bit": {
+                "url": "https://github.com/ShatilKhan/knightingale/releases/download/v$version/knightingale-x86_64-pc-windows-msvc.tar.gz"
+            }
+        }
+    }
+}

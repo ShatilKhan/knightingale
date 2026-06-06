@@ -1,0 +1,29 @@
+# Maintainer: Shatil Khan
+pkgname=knightingale-bin
+pkgver=0.1.0
+pkgrel=1
+pkgdesc="Voice dictation daemon that minds its own business"
+arch=('x86_64' 'aarch64')
+url="https://shatilkhan.github.io/knightingale/"
+license=('MIT')
+depends=('alsa-lib' 'libxkbcommon' 'libnotify')
+optdepends=(
+    'pipewire: PipeWire backend for mic capture'
+    'ydotool: Wayland text injection fallback'
+)
+provides=('knightingale')
+conflicts=('knightingale')
+
+source_x86_64=("$url-x86_64-$pkgver.tar.gz::https://github.com/ShatilKhan/knightingale/releases/download/v$pkgver/knightingale-x86_64-unknown-linux-gnu.tar.gz")
+sha256sums_x86_64=('SKIP'  # bumped by release workflow; SKIP trusts the tagged upstream)
+
+source_aarch64=("$url-aarch64-$pkgver.tar.gz::https://github.com/ShatilKhan/knightingale/releases/download/v$pkgver/knightingale-aarch64-unknown-linux-gnu.tar.gz")
+sha256sums_aarch64=('SKIP'  # bumped by release workflow; SKIP trusts the tagged upstream)
+
+package() {
+    cd "$srcdir/knightingale-${CARCH/x86_64/x86_64-unknown-linux-gnu}"
+    install -Dm755 knightingale "$pkgdir/usr/bin/knightingale"
+    install -Dm755 knightingale-daemon "$pkgdir/usr/bin/knightingale-daemon"
+    install -Dm644 LICENSE "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+    install -Dm644 README.md "$pkgdir/usr/share/doc/$pkgname/README.md"
+}

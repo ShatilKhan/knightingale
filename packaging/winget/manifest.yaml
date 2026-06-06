@@ -1,0 +1,30 @@
+# winget manifest stub for Knightingale.
+#
+# Real submission goes to https://github.com/microsoft/winget-pkgs and uses the
+# multi-file YAML schema (Installer, DefaultLocale, Version). This file is a
+# canonical reference for what to fill in.
+
+PackageIdentifier: ShatilKhan.Knightingale
+PackageVersion: 0.1.0
+PackageLocale: en-US
+Publisher: Shatil Khan
+PublisherUrl: https://github.com/ShatilKhan
+PublisherSupportUrl: https://github.com/ShatilKhan/knightingale/issues
+PackageName: Knightingale
+PackageUrl: https://shatilkhan.github.io/knightingale/
+License: MIT
+LicenseUrl: https://github.com/ShatilKhan/knightingale/blob/main/LICENSE
+ShortDescription: Voice dictation daemon that minds its own business.
+Description: |
+    A minimal cross-platform voice dictation daemon. Bring your own STT key
+    or run Whisper locally via whisper.cpp. Single static binary, no
+    telemetry.
+Tags:
+    - voice
+    - dictation
+    - whisper
+    - speech-to-text
+    - stt
+    - cli
+ManifestType: defaultLocale
+ManifestVersion: 1.5.0
