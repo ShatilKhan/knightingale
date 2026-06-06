@@ -1,5 +1,4 @@
 use std::fs;
-use std::io::Write;
 use std::path::Path;
 
 pub use secrecy::{ExposeSecret, SecretString};
@@ -7,7 +6,9 @@ pub use secrecy::{ExposeSecret, SecretString};
 use crate::config::env_file;
 use crate::error::{KnightError, Result};
 
+#[cfg(unix)]
 const ENV_FILE_MODE: u32 = 0o600;
+#[cfg(unix)]
 const CONFIG_DIR_MODE: u32 = 0o700;
 
 pub fn load_env_file() -> Result<()> {
@@ -94,6 +95,7 @@ fn check_permissions(_path: &Path) -> Result<()> {
 
 #[cfg(unix)]
 fn write_secret_file(path: &Path, body: &[u8]) -> Result<()> {
+    use std::io::Write;
     use std::os::unix::fs::OpenOptionsExt;
     let mut file = fs::OpenOptions::new()
         .write(true)
