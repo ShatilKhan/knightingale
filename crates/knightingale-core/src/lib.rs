@@ -7,6 +7,7 @@ pub mod hotkey;
 pub mod injection;
 pub mod ipc;
 pub mod secret;
+pub mod status;
 pub mod stt;
 pub mod tokens;
 
