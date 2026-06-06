@@ -9,6 +9,7 @@ use knightingale_core::error::KnightError;
 use knightingale_core::hardware;
 use knightingale_core::model::{self, Model};
 use knightingale_core::secret::{SecretString, redact, set_in_env_file};
+use knightingale_core::setup as setup_mod;
 use knightingale_core::stt::Provider;
 
 pub fn logs(since: Option<String>, path_only: bool) -> miette::Result<()> {
@@ -99,7 +100,52 @@ pub fn doctor() -> miette::Result<()> {
         &format!("{}s", cfg.stt.max_recording_secs),
     ]);
 
+    // OS-aware checks: compositor, uinput, macOS permissions.
+    let comp = setup_mod::detect_compositor();
+    table.add_row(vec!["compositor", "info", comp.as_str()]);
+
+    #[cfg(target_os = "linux")]
+    {
+        let uinput_ok = setup_mod::uinput_writable();
+        table.add_row(vec![
+            "/dev/uinput",
+            if uinput_ok { "ok" } else { "fail" },
+            if uinput_ok {
+                "writable"
+            } else {
+                "add user to `input` group: sudo usermod -aG input $USER"
+            },
+        ]);
+    }
+
+    // Hardware summary.
+    let hw = hardware::detect();
+    table.add_row(vec![
+        "cpu",
+        "info",
+        &format!("{} ({} cores)", hw.cpu_brand, hw.cpu_cores),
+    ]);
+    table.add_row(vec!["ram", "info", &format!("{} MB", hw.ram_total_mb)]);
+    if let Some(g) = &hw.gpu {
+        table.add_row(vec![
+            "gpu",
+            "info",
+            &format!("{} {} ({} MB)", g.vendor, g.name, g.vram_mb),
+        ]);
+    } else {
+        table.add_row(vec!["gpu", "info", "none detected (CPU-only)"]);
+    }
+
     println!("{table}");
+
+    // Per-compositor hotkey hint.
+    if let Some(cmd) = setup_mod::hotkey_command(comp, &cfg.hotkey.toggle, "knightingale toggle") {
+        println!(
+            "\n# {} — paste this into your config to bind the hotkey:",
+            comp.as_str()
+        );
+        println!("{cmd}");
+    }
     Ok(())
 }
 

@@ -73,9 +73,7 @@ pub fn detect_compositor() -> Compositor {
 /// writes the binding when run with --apply.
 pub fn hotkey_command(comp: Compositor, binding: &str, exec: &str) -> Option<String> {
     match comp {
-        Compositor::Hyprland => Some(format!(
-            "hyprctl keyword bind \"{binding}, exec, {exec}\""
-        )),
+        Compositor::Hyprland => Some(format!("hyprctl keyword bind \"{binding}, exec, {exec}\"")),
         Compositor::Gnome => Some(format!(
             "# Add a custom keybinding to GNOME:\n\
              gsettings set org.gnome.settings-daemon.plugins.media-keys custom-keybindings \"['/org/gnome/settings-daemon/plugins/media-keys/custom-keybindings/knightingale/']\"\n\
@@ -88,7 +86,11 @@ pub fn hotkey_command(comp: Compositor, binding: &str, exec: &str) -> Option<Str
         )),
         Compositor::Sway | Compositor::I3 => Some(format!(
             "# Append to ~/.config/{}/config:\nbindsym {binding} exec {exec}",
-            if comp == Compositor::Sway { "sway" } else { "i3" }
+            if comp == Compositor::Sway {
+                "sway"
+            } else {
+                "i3"
+            }
         )),
         Compositor::X11 | Compositor::Unknown => None,
     }
