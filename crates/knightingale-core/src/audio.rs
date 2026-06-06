@@ -238,6 +238,29 @@ fn resample_to_16k(input: &[i16], source_rate: u32) -> Result<Vec<i16>> {
     Ok(resampled)
 }
 
+/// Trim leading and trailing silence from a PCM buffer.
+///
+/// Samples below `threshold` (absolute value) are considered silent. Cuts the
+/// dead air that Whisper sometimes hallucinates "thank you for watching" /
+/// "subtitles by …" over, and shrinks payload to the cloud STT endpoint.
+pub fn trim_edge_silence(samples: &[i16], threshold: i16) -> &[i16] {
+    let threshold = threshold.unsigned_abs() as i32;
+    let start = samples
+        .iter()
+        .position(|s| (*s as i32).unsigned_abs() as i32 > threshold)
+        .unwrap_or(samples.len());
+    if start == samples.len() {
+        return &[];
+    }
+    let end = samples.len()
+        - samples
+            .iter()
+            .rev()
+            .position(|s| (*s as i32).unsigned_abs() as i32 > threshold)
+            .unwrap_or(0);
+    &samples[start..end]
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -254,5 +277,19 @@ mod tests {
         let input = vec![0.0f32, 1.0, -1.0, 2.0, -2.0];
         let out = f32_to_i16(&input);
         assert_eq!(out, vec![0, i16::MAX, -i16::MAX, i16::MAX, -i16::MAX]);
+    }
+
+    #[test]
+    fn trim_strips_edges() {
+        let samples: Vec<i16> = vec![10, 20, 30, 5000, 6000, 7000, 40, 30, 20];
+        let trimmed = trim_edge_silence(&samples, 100);
+        assert_eq!(trimmed, &[5000, 6000, 7000]);
+    }
+
+    #[test]
+    fn trim_handles_all_silent() {
+        let samples: Vec<i16> = vec![10, 20, 30, 40];
+        let trimmed = trim_edge_silence(&samples, 100);
+        assert!(trimmed.is_empty());
     }
 }
