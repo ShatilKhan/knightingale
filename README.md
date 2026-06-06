@@ -73,16 +73,24 @@ One config field selects which credential block to read. Eight named providers s
 
 API keys live in `~/.config/knightingale/.env` (mode 0600). The TOML config beside it is safe to share.
 
-## Local models *(Phase 2)*
+## Local models
 
-Pull a model once, run it forever:
+Knightingale doesn't auto-pull Whisper checkpoints — that's an Ollama-class
+feature and not worth the complexity for a one-time setup. Instead:
 
 ```sh
-knightingale model pull distil-small.en
-knightingale model recommend       # spec-aware pick based on your hardware
+knightingale model recommend           # spec-aware pick for your machine
+knightingale model where <alias>       # prints the curl command
 ```
 
-`knightingale model list` shows the catalog. Sizes range from `tiny.en` (~32 MB) to `large-v3` (~1.1 GB Q5). The default `distil-small.en` is real-time on CPU and fits 4 GB VRAM laptops; `large-v3-turbo` is the sweet spot for RTX-class GPUs.
+Run the curl line once, then point `KNIGHTINGALE_MODEL_PATH` at the file:
+
+```sh
+echo 'KNIGHTINGALE_MODEL_PATH=~/.cache/knightingale/models/ggml-distil-small.en-q5_1.bin' \
+  >> ~/.config/knightingale/.env
+```
+
+`model list` shows the catalog. Sizes range from `tiny.en` (~32 MB) to `large-v3` (~1.1 GB Q5). The default `distil-small.en` is real-time on CPU and fits 4 GB VRAM laptops; `large-v3-turbo` is the sweet spot for RTX-class GPUs.
 
 ## Privacy
 
