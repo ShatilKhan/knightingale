@@ -10,6 +10,7 @@ pub mod injection;
 pub mod ipc;
 pub mod model;
 pub mod secret;
+pub mod setup;
 pub mod status;
 pub mod stt;
 pub mod tokens;
