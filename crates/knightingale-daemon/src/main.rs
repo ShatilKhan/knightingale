@@ -269,28 +269,11 @@ impl Session {
 
     fn transcribe_and_inject(&self, samples: &[i16]) -> Result<()> {
         let wav = audio::pcm_to_wav(samples)?;
-        if self.cfg.stt.backend == SttBackend::Local {
-            return Err(KnightError::ModelMissing(
-                "local backend not yet wired".into(),
-            ));
-        }
-        let provider = Provider::from_env();
-        let mut transcriber: Box<dyn Transcriber> = build_transcriber(provider)?;
-        // Wire vocab hints: build a prompt from global + per-app hints.
-        let prompt = knightingale_core::focus::build_prompt(
-            &self.cfg.stt.vocabulary_hints,
-            &self.cfg.stt.vocabulary_per_app,
-        );
-        if prompt.is_some() {
-            // Best-effort: the OpenAI client supports a prompt field via the
-            // builder. Other backends ignore it. We use a downcast-equivalent
-            // pattern by rebuilding the client with the prompt set.
-            if let Ok(Some(mut client)) = provider.build_openai_client() {
-                client = client.with_prompt(prompt);
-                transcriber = Box::new(client);
-            }
-        }
-        let text = transcriber.transcribe(&wav, &self.cfg.stt.language)?;
+        let text = if self.cfg.stt.backend == SttBackend::Local {
+            self.transcribe_local(&wav)?
+        } else {
+            self.transcribe_cloud(&wav)?
+        };
         if text.is_empty() {
             return Ok(());
         }
@@ -298,6 +281,45 @@ impl Session {
         injection::inject(&text, self.cfg.injection.method)?;
         let _ = TARGET_SAMPLE_RATE;
         Ok(())
+    }
+
+    fn transcribe_cloud(&self, wav: &[u8]) -> Result<String> {
+        let provider = Provider::from_env();
+        let mut transcriber: Box<dyn Transcriber> = build_transcriber(provider)?;
+        // Vocab hints: prepend global + per-app hints as the `prompt` field.
+        let prompt = knightingale_core::focus::build_prompt(
+            &self.cfg.stt.vocabulary_hints,
+            &self.cfg.stt.vocabulary_per_app,
+        );
+        if prompt.is_some()
+            && let Ok(Some(mut client)) = provider.build_openai_client()
+        {
+            client = client.with_prompt(prompt);
+            transcriber = Box::new(client);
+        }
+        transcriber.transcribe(wav, &self.cfg.stt.language)
+    }
+
+    #[cfg(feature = "local-stt")]
+    fn transcribe_local(&self, wav: &[u8]) -> Result<String> {
+        use knightingale_core::stt::LocalWhisper;
+        let path = std::env::var("KNIGHTINGALE_MODEL_PATH").map_err(|_| {
+            KnightError::ModelMissing(
+                "KNIGHTINGALE_MODEL_PATH not set; run `knightingale model where <alias>`".into(),
+            )
+        })?;
+        let path = std::path::PathBuf::from(shellexpand::tilde(&path).into_owned());
+        let model = LocalWhisper::load(&path, Some(self.cfg.stt.language.clone()))?;
+        model.transcribe(wav, &self.cfg.stt.language)
+    }
+
+    #[cfg(not(feature = "local-stt"))]
+    fn transcribe_local(&self, _wav: &[u8]) -> Result<String> {
+        Err(KnightError::ModelMissing(
+            "this binary was built without the `local-stt` feature; \
+             rebuild with `cargo build --features knightingale-daemon/local-stt` or use a cloud provider"
+                .into(),
+        ))
     }
 
     fn cancel(&mut self) {

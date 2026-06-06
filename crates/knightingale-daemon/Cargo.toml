@@ -13,8 +13,16 @@ homepage.workspace = true
 name = "knightingale-daemon"
 path = "src/main.rs"
 
+[features]
+default = []
+local-stt = ["knightingale-core/local-stt"]
+vulkan = ["knightingale-core/vulkan"]
+cuda = ["knightingale-core/cuda"]
+metal = ["knightingale-core/metal"]
+
 [dependencies]
 knightingale-core = { workspace = true }
+shellexpand = "3"
 tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["env-filter", "fmt"] }
 tracing-appender = "0.2"

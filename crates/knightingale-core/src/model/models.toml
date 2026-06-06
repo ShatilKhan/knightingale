@@ -1,17 +1,17 @@
 # Catalog of supported local Whisper models.
 #
-# Aliases let `knightingale model list` and `model recommend` print useful
-# tables. There is no auto-download — that's an Ollama-class feature.
+# Aliases let `knightingale model list` / `recommend` / `where` print useful
+# tables and download instructions. There is no auto-download — that's an
+# Ollama-class feature.
 #
-# To install a model:
-#   1. Pick an alias from `knightingale model list`.
-#   2. Run `knightingale model where <alias>` to get the curl command.
-#   3. curl the file into `~/.cache/knightingale/models/` (or anywhere).
-#   4. Set `KNIGHTINGALE_MODEL_PATH=<file>` in `~/.config/knightingale/.env`
-#      (or edit `config.toml`).
+#   1. Pick an alias with `knightingale model list` or `recommend`.
+#   2. Run `knightingale model where <alias>` to print the curl command.
+#   3. Run that curl line.
+#   4. Set `KNIGHTINGALE_MODEL_PATH=<path>` in `~/.config/knightingale/.env`.
 #
-# URLs point at the canonical ggerganov / distil-whisper GGUF files on
-# Hugging Face. Sizes are Q5_1 quantization unless noted.
+# URLs point at the canonical GGUF files published by the whisper.cpp project
+# on Hugging Face. Quantization noted in the filename (Q5_0 for the larger
+# multilingual checkpoints, Q5_1 for tiny/base/small variants).
 
 [[model]]
 alias = "tiny.en"
@@ -20,7 +20,7 @@ url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-tiny.en-q5
 size_mb = 32
 vram_mb = 200
 language = "en"
-recommended_for = "very weak hardware, smoke test"
+recommended_for = "smoke test, very weak hardware"
 
 [[model]]
 alias = "base.en"
@@ -32,36 +32,36 @@ language = "en"
 recommended_for = "weak hardware"
 
 [[model]]
-alias = "distil-small.en"
-filename = "ggml-distil-small.en-q5_1.bin"
-url = "https://huggingface.co/distil-whisper/distil-small.en/resolve/main/ggml-distil-small.en-q5_1.bin"
-size_mb = 120
-vram_mb = 500
+alias = "small.en"
+filename = "ggml-small.en-q5_1.bin"
+url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-small.en-q5_1.bin"
+size_mb = 190
+vram_mb = 600
 language = "en"
 recommended_for = "4 GB VRAM laptops, English"
 
 [[model]]
-alias = "distil-medium.en"
-filename = "ggml-distil-medium.en-q5_1.bin"
-url = "https://huggingface.co/distil-whisper/distil-medium.en/resolve/main/ggml-distil-medium.en-q5_1.bin"
-size_mb = 280
-vram_mb = 1000
+alias = "medium.en"
+filename = "ggml-medium.en-q5_0.bin"
+url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-medium.en-q5_0.bin"
+size_mb = 514
+vram_mb = 1500
 language = "en"
-recommended_for = "mid-tier GPU, English sweet spot"
+recommended_for = "mid-tier GPU, English"
 
 [[model]]
 alias = "distil-large-v3"
-filename = "ggml-distil-large-v3-q5_1.bin"
-url = "https://huggingface.co/distil-whisper/distil-large-v3/resolve/main/ggml-distil-large-v3-q5_1.bin"
-size_mb = 500
+filename = "ggml-distil-large-v3.bin"
+url = "https://huggingface.co/distil-whisper/distil-large-v3-ggml/resolve/main/ggml-distil-large-v3.bin"
+size_mb = 1500
 vram_mb = 2000
 language = "en"
 recommended_for = "English, near-large-v3 quality"
 
 [[model]]
 alias = "large-v3-turbo"
-filename = "ggml-large-v3-turbo-q5_1.bin"
-url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_1.bin"
+filename = "ggml-large-v3-turbo-q5_0.bin"
+url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-turbo-q5_0.bin"
 size_mb = 574
 vram_mb = 2000
 language = "multi"
@@ -69,8 +69,8 @@ recommended_for = "accuracy + multilingual, RTX-class"
 
 [[model]]
 alias = "large-v3"
-filename = "ggml-large-v3-q5_1.bin"
-url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-q5_1.bin"
+filename = "ggml-large-v3-q5_0.bin"
+url = "https://huggingface.co/ggerganov/whisper.cpp/resolve/main/ggml-large-v3-q5_0.bin"
 size_mb = 1100
 vram_mb = 3500
 language = "multi"
