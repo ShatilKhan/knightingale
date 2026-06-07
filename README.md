@@ -125,7 +125,7 @@ Documentation site: [shatilkhan.github.io/knightingale](https://shatilkhan.githu
 
 ## Contributing
 
-Issues and PRs welcome. The plan and decision log live in a separate context repo at [ShatilKhan/cuntxt](https://github.com/ShatilKhan/cuntxt) under `knightingale/PLAN.md` — read it before proposing a refactor.
+Issues and PRs welcome. Read [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) before proposing a refactor.
 
 ## License
 

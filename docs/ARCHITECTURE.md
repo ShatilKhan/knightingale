@@ -1,9 +1,7 @@
 # Architecture
 
-Knightingale is a small voice-dictation daemon plus a CLI client. The hard
-choices are documented in
-[`ShatilKhan/cuntxt → knightingale/PLAN.md`](https://github.com/ShatilKhan/cuntxt/blob/main/knightingale/PLAN.md);
-this document is the read-the-code-with-a-map version.
+Knightingale is a small voice-dictation daemon plus a CLI client. This
+document is the read-the-code-with-a-map version of the design.
 
 ## Workspace
 
@@ -172,8 +170,6 @@ Windows service stop) is wired through `ctrlc` and drops in-flight work within
 
 ## See also
 
-- `~/dev/cuntxt/knightingale/PLAN.md` — the rolling design doc
-  (Plan / Architecture / Decisions / Updates).
-- `~/dev/cuntxt/knightingale/LEARNING.md` — curated reading list.
 - `design-system/cli/style-guide.md` — terminal colour rules, spacing,
   microcopy.
+- `design-system/tokens/colors.md` — palette and photo-treatment rules.
