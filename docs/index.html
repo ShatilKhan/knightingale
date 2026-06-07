@@ -12,711 +12,693 @@
 <link rel="icon" type="image/png" href="brand/2-mark.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=EB+Garamond:ital,wght@0,400..800;1,400..800&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=EB+Garamond:ital,wght@0,400..700;1,400..700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 :root {
-    --forest:   #1F3A2A;
-    --forest-2: #2D4A3E;
-    --forest-3: #14271C;
-    --sage:     #6B7A66;
-    --sage-2:   #8A9B82;
-    --cream:    #F4F1E8;
-    --cream-2:  #E8E2D0;
-    --cream-3: #FAF8F1;
-    --ink:      #1A2622;
-    --moss:     #5C8052;
-    --moss-2:  #6E9263;
-    --amber:    #B8924A;
-    --coral:    #A45248;
-    --shadow-sm: 0 1px 2px rgba(20, 39, 28, 0.06);
-    --shadow-md: 0 4px 16px rgba(20, 39, 28, 0.08);
-    --shadow-lg: 0 12px 48px rgba(20, 39, 28, 0.12);
-    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --paper:      #F4F1E8;
+    --paper-2:    #ECE7D8;
+    --paper-deep: #E3DCC8;
+    --ink:        #1A2622;
+    --ink-soft:   #3D4A40;
+    --ink-faint:  #6B7A66;
+    --hairline:   rgba(26, 38, 34, 0.28);
+    --hairline-2: rgba(26, 38, 34, 0.14);
+    --forest:     #1F3A2A;
+    --forest-3:   #14271C;
+    --moss:       #5C8052;
+    --lichen:     #BBDF8E;
+    --amber:      #B8924A;
+    --ease: cubic-bezier(0.22, 1, 0.36, 1);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
-html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+html { height: 100%; }
 body {
-    background: var(--cream);
+    height: 100%;
+    background: var(--paper);
     color: var(--ink);
-    font-family: 'Inter', system-ui, sans-serif;
-    line-height: 1.65;
-    font-size: 17px;
-    overflow-x: hidden;
-}
-a {
-    color: var(--forest-2);
-    text-decoration: none;
-    transition: color 0.2s var(--ease-out);
-}
-a:hover { color: var(--moss); }
-code, pre {
-    font-family: 'JetBrains Mono', ui-monospace, monospace;
-    font-feature-settings: "calt", "liga";
-}
-h1, h2, h3 {
     font-family: 'EB Garamond', Georgia, serif;
-    color: var(--forest);
-    font-weight: 500;
-    letter-spacing: -0.015em;
-    line-height: 1.15;
-}
-
-/* Sticky header */
-.nav {
-    position: fixed;
-    top: 0; left: 0; right: 0;
-    padding: 0.9rem 2rem;
-    background: rgba(244, 241, 232, 0);
-    backdrop-filter: blur(0px);
-    transition: background 0.4s var(--ease-out), backdrop-filter 0.4s var(--ease-out), box-shadow 0.4s var(--ease-out);
-    z-index: 100;
-    display: flex; justify-content: space-between; align-items: center;
-}
-.nav.scrolled {
-    background: rgba(244, 241, 232, 0.85);
-    backdrop-filter: blur(12px) saturate(140%);
-    box-shadow: var(--shadow-sm);
-}
-.nav .brand {
-    display: flex; align-items: center; gap: 0.6rem;
-    font-family: 'EB Garamond', Georgia, serif;
-    font-size: 1.15rem;
-    color: var(--forest);
-    font-weight: 600;
-    letter-spacing: -0.01em;
-    opacity: 0;
-    transition: opacity 0.4s var(--ease-out);
-}
-.nav.scrolled .brand { opacity: 1; }
-.nav .brand img { width: 28px; height: 28px; }
-.nav .links { display: flex; gap: 1.5rem; font-size: 14px; }
-.nav .links a { color: var(--ink); font-weight: 500; }
-.nav .links a:hover { color: var(--forest); }
-
-/* Hero */
-.hero {
-    min-height: 88vh;
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    padding: 4rem 1.5rem 2rem;
-    text-align: center;
-    position: relative;
-    overflow: hidden;
-}
-.hero::before {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background:
-        radial-gradient(circle at 50% 30%, rgba(92, 128, 82, 0.05), transparent 50%),
-        radial-gradient(circle at 80% 70%, rgba(31, 58, 42, 0.04), transparent 50%);
-    pointer-events: none;
-    z-index: 0;
-}
-.hero > * { position: relative; z-index: 1; }
-.hero .logo-wrap {
-    margin-bottom: 1.5rem;
-    animation: float 6s ease-in-out infinite;
-}
-.hero .logo {
-    width: 240px; height: auto;
-    filter: drop-shadow(0 12px 32px rgba(20, 39, 28, 0.18));
-}
-@keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-8px); }
-}
-.hero h1 {
-    font-size: clamp(3rem, 8vw, 5rem);
-    margin-bottom: 0.5rem;
-    letter-spacing: -0.025em;
-    background: linear-gradient(135deg, var(--forest) 0%, var(--moss) 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-}
-.tagline {
-    font-family: 'EB Garamond', Georgia, serif;
-    font-size: clamp(1.2rem, 2.5vw, 1.5rem);
-    font-style: italic;
-    color: var(--sage);
-    margin-bottom: 2.5rem;
-    letter-spacing: 0.01em;
-}
-.badge-row {
-    display: flex; gap: 0.5rem; flex-wrap: wrap; justify-content: center;
-    margin-bottom: 2.5rem;
-    max-width: 760px;
-}
-.badge-row img { height: 22px; transition: transform 0.2s var(--ease-out); }
-.badge-row a:hover img { transform: translateY(-2px); }
-.cta-row { display: flex; gap: 0.75rem; flex-wrap: wrap; justify-content: center; }
-.cta {
-    display: inline-flex; align-items: center; gap: 0.5rem;
-    background: var(--forest);
-    color: var(--cream);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 15px;
-    padding: 0.95rem 1.5rem;
-    border-radius: 6px;
-    border: 1px solid var(--forest);
-    transition: all 0.25s var(--ease-out);
-    box-shadow: var(--shadow-sm);
-    cursor: pointer;
-    text-decoration: none;
-}
-.cta:hover {
-    background: var(--forest-2);
-    color: var(--cream);
-    transform: translateY(-2px);
-    box-shadow: var(--shadow-md);
-}
-.cta.secondary { background: transparent; color: var(--forest); }
-.cta.secondary:hover { background: var(--cream-2); color: var(--forest); }
-.cta svg { width: 16px; height: 16px; }
-
-/* Terminal demo */
-.terminal-section {
-    max-width: 860px;
-    margin: 0 auto;
-    padding: 3rem 1.5rem 4rem;
-}
-.terminal {
-    background: var(--forest-3);
-    border-radius: 10px;
-    overflow: hidden;
-    box-shadow: var(--shadow-lg);
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-.terminal-header {
-    background: rgba(0, 0, 0, 0.25);
-    padding: 0.75rem 1rem;
-    display: flex; align-items: center; gap: 0.5rem;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
-}
-.terminal-dot { width: 12px; height: 12px; border-radius: 50%; }
-.terminal-dot.red { background: #ff5f56; }
-.terminal-dot.yellow { background: #ffbd2e; }
-.terminal-dot.green { background: #27c93f; }
-.terminal-title {
-    margin-left: 0.75rem;
-    color: rgba(244, 241, 232, 0.5);
-    font-size: 12px;
-}
-.terminal-body {
-    padding: 1.5rem 1.75rem;
-    color: var(--cream);
+    font-size: 18px;
     line-height: 1.6;
-    min-height: 240px;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
 }
-.terminal .prompt { color: var(--moss-2); font-weight: 500; }
-.terminal .cmd { color: var(--cream); }
-.terminal .out { color: var(--sage-2); display: block; padding-left: 0; }
-.terminal .accent { color: var(--moss-2); }
-.terminal .warn { color: var(--amber); }
-.cursor {
-    display: inline-block;
-    width: 8px; height: 1.1em;
-    background: var(--moss-2);
-    vertical-align: text-bottom;
-    animation: blink 1s steps(2) infinite;
+/* Paper fibre + laid lines */
+body::before {
+    content: ''; position: fixed; inset: 0; z-index: 0; pointer-events: none;
+    background-image:
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='240' height='240' filter='url(%23n)' opacity='0.5'/%3E%3C/svg%3E"),
+        repeating-linear-gradient(0deg, transparent 0 23px, rgba(26,38,34,0.022) 23px 24px);
+    opacity: 0.5;
 }
+a { color: var(--moss); text-decoration: none; border-bottom: 1px solid rgba(92,128,82,0.35); transition: color .2s var(--ease), border-color .2s var(--ease); }
+a:hover { color: var(--forest); border-color: var(--forest); }
+code, pre, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+/* ============ Engraved plate frame (fixed chrome) ============ */
+.plate-frame {
+    position: fixed; inset: 14px; z-index: 95; pointer-events: none;
+    border: 1px solid var(--hairline);
+}
+.plate-frame::before {
+    content: ''; position: absolute; inset: 4px;
+    border: 1px solid var(--hairline-2);
+}
+.plate-frame .corner {
+    position: absolute; width: 14px; height: 14px;
+    border-color: var(--ink-soft); border-style: solid; border-width: 0;
+}
+.plate-frame .tl { top: -1px; left: -1px; border-top-width: 2px; border-left-width: 2px; }
+.plate-frame .tr { top: -1px; right: -1px; border-top-width: 2px; border-right-width: 2px; }
+.plate-frame .bl { bottom: -1px; left: -1px; border-bottom-width: 2px; border-left-width: 2px; }
+.plate-frame .br { bottom: -1px; right: -1px; border-bottom-width: 2px; border-right-width: 2px; }
+
+/* ============ Top rule: title + links ============ */
+.masthead {
+    position: fixed; top: 26px; left: 40px; right: 40px; z-index: 96;
+    display: flex; justify-content: space-between; align-items: baseline;
+    font-size: 12.5px; letter-spacing: 0.16em; text-transform: uppercase;
+    color: var(--ink-soft);
+    font-family: 'EB Garamond', serif; font-weight: 500;
+}
+.masthead .links { display: flex; gap: 1.6rem; }
+.masthead a { border: none; color: var(--ink-soft); }
+.masthead a:hover { color: var(--forest); }
+
+/* ============ Right-edge plate numerals (the page dots) ============ */
+.numerals {
+    position: fixed; right: 26px; top: 50%; transform: translateY(-50%);
+    z-index: 96; display: flex; flex-direction: column; gap: 0.9rem; align-items: center;
+    background: rgba(244, 241, 232, 0.92);
+    border: 1px solid var(--hairline-2);
+    padding: 0.6rem 0.3rem;
+}
+.numeral {
+    font-family: 'EB Garamond', serif; font-size: 13px; letter-spacing: 0.08em;
+    color: var(--ink-faint);
+    background: none; border: none; cursor: pointer;
+    padding: 2px 6px;
+    position: relative;
+    transition: color .35s var(--ease);
+}
+.numeral::after {
+    content: ''; position: absolute; left: 50%; bottom: -3px;
+    width: 0; height: 1.5px; background: var(--moss);
+    transform: translateX(-50%);
+    transition: width .4s var(--ease);
+}
+.numeral.active { color: var(--forest); font-weight: 600; }
+.numeral.active::after { width: 100%; }
+
+/* ============ Scroll container ============ */
+.pages { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; scrollbar-width: none; position: relative; z-index: 1; }
+.pages::-webkit-scrollbar { display: none; }
+section.plate {
+    position: relative; min-height: 100vh; height: 100vh;
+    scroll-snap-align: start; scroll-snap-stop: always;
+    overflow: hidden;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    padding: 4.5rem 4rem 3rem;
+}
+
+/* Plate label */
+.plate-label {
+    position: absolute; top: 62px; left: 50%; transform: translateX(-50%);
+    display: flex; align-items: center; gap: 1rem;
+    font-size: 12px; letter-spacing: 0.3em; text-transform: uppercase;
+    color: var(--ink-soft); white-space: nowrap;
+}
+.plate-label::before, .plate-label::after {
+    content: ''; width: 70px; height: 1px; background: var(--hairline);
+}
+
+/* Marginalia — rotated field notes on the edges */
+.marginalia {
+    position: absolute; z-index: 2;
+    font-family: 'JetBrains Mono', monospace; font-size: 10px;
+    letter-spacing: 0.12em; color: var(--ink-faint);
+    writing-mode: vertical-rl; text-orientation: mixed;
+    opacity: 0.75;
+}
+.marginalia.left { left: 34px; top: 50%; transform: translateY(-50%) rotate(180deg); }
+.marginalia.right2 { right: 56px; bottom: 100px; }
+
+/* Reveal */
+.reveal { opacity: 0; transform: translateY(26px); transition: opacity .9s var(--ease), transform .9s var(--ease); }
+.reveal.d1 { transition-delay: .08s; } .reveal.d2 { transition-delay: .18s; }
+.reveal.d3 { transition-delay: .28s; } .reveal.d4 { transition-delay: .4s; }
+section.plate.active .reveal { opacity: 1; transform: translateY(0); }
+
+/* ============ PLATE I — hero ============ */
+.hero-grid {
+    display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 0.85fr);
+    gap: 3.5rem; align-items: center; width: min(1180px, 100%);
+}
+h1.title {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 380;
+    font-style: italic;
+    font-size: clamp(3.6rem, 7.5vw, 6.4rem);
+    line-height: 0.98;
+    letter-spacing: -0.02em;
+    color: var(--forest);
+}
+.taxonomy {
+    margin-top: 0.9rem;
+    font-style: italic; font-size: 1.05rem; color: var(--ink-soft);
+}
+.taxonomy .sep { font-style: normal; color: var(--ink-faint); padding: 0 0.35em; }
+.taxonomy .fam { font-variant: small-caps; font-style: normal; letter-spacing: 0.06em; }
+
+/* Sonogram card */
+.sonogram-card {
+    margin-top: 1.9rem;
+    border: 1px solid var(--hairline);
+    background: rgba(255, 253, 247, 0.6);
+    position: relative;
+}
+.sonogram-card .scale {
+    position: absolute; left: 8px; top: 6px; bottom: 24px;
+    display: flex; flex-direction: column; justify-content: space-between;
+    font-family: 'JetBrains Mono', monospace; font-size: 8.5px; color: var(--ink-faint);
+}
+.sonogram-card canvas { display: block; width: 100%; height: 110px; }
+.sonogram-card .axis {
+    border-top: 1px solid var(--hairline-2);
+    display: flex; justify-content: space-between;
+    padding: 3px 10px 4px 36px;
+    font-family: 'JetBrains Mono', monospace; font-size: 8.5px; color: var(--ink-faint);
+}
+.transcription {
+    margin-top: 0.8rem;
+    font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+    color: var(--ink-soft); min-height: 1.5em;
+}
+.transcription .prompt { color: var(--moss); }
+.caret { display: inline-block; width: 7px; height: 1.05em; background: var(--moss); vertical-align: text-bottom; animation: blink 1.05s steps(2) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
-/* Sections */
-.section { max-width: 860px; margin: 0 auto; padding: 5rem 1.5rem; }
-.section.alt { background: var(--cream-2); max-width: 100%; padding: 5rem 1.5rem; }
-.section.alt .inner { max-width: 860px; margin: 0 auto; }
-.section h2 {
-    font-size: clamp(2rem, 4vw, 2.6rem);
-    margin-bottom: 0.75rem;
-    text-align: left;
-}
-.section .eyebrow {
-    font-family: 'JetBrains Mono', monospace;
-    color: var(--moss);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    margin-bottom: 0.5rem;
-    display: block;
-}
-.section .lead {
-    font-size: 1.1rem;
-    color: var(--sage);
-    margin-bottom: 2.5rem;
-    max-width: 60ch;
-}
-
-/* Feature grid */
-.feature-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-    gap: 1.5rem;
-}
-.feature {
-    background: var(--cream-3);
-    padding: 1.75rem;
-    border-radius: 8px;
-    border: 1px solid var(--cream-2);
-    transition: transform 0.3s var(--ease-out), box-shadow 0.3s var(--ease-out), border-color 0.3s var(--ease-out);
-}
-.feature:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow-md);
-    border-color: var(--moss);
-}
-.feature .icon {
-    width: 32px; height: 32px;
-    background: var(--forest);
-    color: var(--cream);
-    border-radius: 6px;
-    display: flex; align-items: center; justify-content: center;
-    margin-bottom: 1rem;
-    font-family: 'EB Garamond', serif;
-    font-size: 1.3rem;
-    font-weight: 700;
-}
-.feature h3 { font-size: 1.2rem; margin-bottom: 0.5rem; }
-.feature p { color: var(--sage); font-size: 15px; }
-.feature code { background: var(--cream-2); padding: 0.1em 0.4em; border-radius: 3px; font-size: 0.9em; }
-
-/* Install tabs */
-.tabs {
-    display: flex; gap: 0.25rem;
-    margin-bottom: 1rem;
-    border-bottom: 1px solid var(--cream-2);
-}
-.tab {
-    background: transparent;
-    border: none;
-    padding: 0.65rem 1.1rem;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 13px;
-    color: var(--sage);
+.cta-row { display: flex; gap: 0.9rem; margin-top: 1.8rem; flex-wrap: wrap; }
+.cta {
+    font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+    padding: 0.85rem 1.4rem;
+    background: var(--forest); color: var(--paper);
+    border: 1px solid var(--forest); border-bottom-width: 3px;
     cursor: pointer;
-    border-bottom: 2px solid transparent;
-    margin-bottom: -1px;
-    transition: color 0.2s var(--ease-out), border-color 0.2s var(--ease-out);
+    transition: transform .18s var(--ease), border-bottom-width .18s var(--ease), background .25s var(--ease);
 }
-.tab:hover { color: var(--forest); }
+.cta:hover { transform: translateY(1px); border-bottom-width: 2px; background: var(--forest-3); color: var(--paper); }
+.cta.ghost { background: transparent; color: var(--forest); border-color: var(--forest); border-bottom-width: 3px; }
+.cta.ghost:hover { background: rgba(31,58,42,0.06); color: var(--forest); }
+
+/* Mounted specimen photo */
+.specimen {
+    position: relative;
+    transform: rotate(-1.6deg);
+    transition: transform .5s var(--ease);
+    will-change: transform;
+}
+.specimen:hover { transform: rotate(0deg) scale(1.012); }
+.specimen .mount {
+    border: 1px solid var(--hairline);
+    padding: 12px;
+    background: #FFFDF7;
+    box-shadow: 0 14px 38px rgba(26, 38, 34, 0.18), 0 3px 10px rgba(26, 38, 34, 0.1);
+}
+.specimen img { display: block; width: 100%; height: auto; filter: sepia(0.06); }
+.specimen .fig {
+    margin-top: 10px;
+    text-align: center; font-style: italic; font-size: 0.9rem; color: var(--ink-soft);
+}
+.specimen .tape {
+    position: absolute; width: 86px; height: 26px;
+    background: rgba(212, 200, 165, 0.55);
+    border-left: 1px dashed rgba(26,38,34,0.12); border-right: 1px dashed rgba(26,38,34,0.12);
+    backdrop-filter: blur(1px);
+}
+.specimen .tape.t1 { top: -12px; left: 8%; transform: rotate(-5deg); z-index: 2; }
+.specimen .tape.t2 { top: -10px; right: 6%; transform: rotate(4deg); z-index: 2; }
+
+.badge-row { display: flex; gap: 0.45rem; margin-top: 1.5rem; flex-wrap: wrap; }
+.badge-row img { height: 20px; filter: sepia(0.12) saturate(0.92); }
+
+/* ============ PLATE II — acquisition ============ */
+.acq { width: min(880px, 100%); }
+h2.plate-h {
+    font-family: 'Fraunces', serif; font-weight: 380;
+    font-size: clamp(2.2rem, 4.6vw, 3.4rem);
+    line-height: 1.04; color: var(--forest);
+}
+h2.plate-h em { font-style: italic; }
+.lead { margin-top: 0.7rem; font-size: 1.1rem; color: var(--ink-soft); max-width: 60ch; }
+.tabs { display: flex; gap: 0; margin-top: 2rem; border-bottom: 1px solid var(--hairline); }
+.tab {
+    font-family: 'JetBrains Mono', monospace; font-size: 12.5px; letter-spacing: 0.04em;
+    background: none; border: none; cursor: pointer;
+    color: var(--ink-faint);
+    padding: 0.6rem 1.15rem; margin-bottom: -1px;
+    border-bottom: 2px solid transparent;
+    transition: color .2s var(--ease), border-color .2s var(--ease);
+}
+.tab:hover { color: var(--ink); }
 .tab.active { color: var(--forest); border-bottom-color: var(--moss); }
 .tab-content { display: none; }
-.tab-content.active { display: block; animation: fadeIn 0.3s var(--ease-out); }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-
+.tab-content.active { display: block; animation: fadeIn .3s var(--ease); }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: none; } }
 .copy-block {
-    position: relative;
-    background: var(--ink);
-    color: var(--cream);
-    padding: 1.25rem 4rem 1.25rem 1.5rem;
-    border-radius: 6px;
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 14px;
-    overflow-x: auto;
-    border: 1px solid rgba(255, 255, 255, 0.05);
+    position: relative; margin-top: 1rem;
+    background: var(--forest-3); color: var(--paper);
+    font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
+    padding: 1.1rem 4.4rem 1.1rem 1.3rem;
+    overflow-x: auto; white-space: nowrap;
+    box-shadow: 0 10px 28px rgba(26, 38, 34, 0.22);
 }
-.copy-block .copy-btn {
-    position: absolute;
-    top: 50%; right: 0.75rem;
-    transform: translateY(-50%);
-    background: transparent;
-    border: 1px solid rgba(244, 241, 232, 0.2);
-    color: var(--cream);
-    padding: 0.4rem 0.7rem;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 12px;
-    font-family: inherit;
-    transition: all 0.2s var(--ease-out);
+.copy-btn {
+    position: absolute; top: 50%; right: 0.8rem; transform: translateY(-50%);
+    font-family: inherit; font-size: 11px;
+    background: transparent; color: var(--lichen);
+    border: 1px solid rgba(187, 223, 142, 0.45);
+    padding: 0.32rem 0.6rem; cursor: pointer;
+    transition: all .2s var(--ease);
 }
-.copy-block .copy-btn:hover {
-    background: rgba(244, 241, 232, 0.1);
-    border-color: var(--moss-2);
+.copy-btn:hover { background: rgba(187, 223, 142, 0.12); }
+.copy-btn.copied { background: var(--lichen); color: var(--forest-3); border-color: var(--lichen); }
+.terminal {
+    margin-top: 1.6rem;
+    background: var(--forest-3); color: var(--paper);
+    font-family: 'JetBrains Mono', monospace; font-size: 13px;
+    box-shadow: 0 14px 36px rgba(26, 38, 34, 0.25);
 }
-.copy-block .copy-btn.copied { background: var(--moss); border-color: var(--moss); color: var(--cream); }
+.terminal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0.5rem 0.95rem;
+    border-bottom: 1px solid rgba(244, 241, 232, 0.12);
+    color: rgba(244, 241, 232, 0.55); font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+}
+.terminal-body { padding: 1.05rem 1.25rem; min-height: 128px; line-height: 1.7; white-space: pre-line; }
+.terminal .prompt, .terminal .ok { color: var(--lichen); }
+.terminal .warn { color: var(--amber); }
+.t-caret { display: inline-block; width: 7px; height: 1.05em; background: var(--lichen); vertical-align: text-bottom; animation: blink 1s steps(2) infinite; }
 
-/* Provider table */
-table { border-collapse: collapse; width: 100%; margin: 1.5rem 0; font-size: 15px; }
-th, td {
-    padding: 0.75rem 0.9rem;
-    border-bottom: 1px solid var(--cream-2);
-    text-align: left;
-    transition: background 0.2s var(--ease-out);
+/* ============ PLATE III — taxonomy of providers ============ */
+.tax { width: min(980px, 100%); display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr); gap: 3rem; align-items: start; }
+.ledger { border-top: 2px solid var(--ink); }
+.ledger table { width: 100%; border-collapse: collapse; font-size: 14.5px; }
+.ledger th {
+    text-align: left; font-weight: 500; font-variant: small-caps; letter-spacing: 0.08em;
+    color: var(--ink-soft); padding: 0.55rem 0.6rem 0.45rem;
+    border-bottom: 1px solid var(--hairline);
 }
-tr:hover td { background: var(--cream-3); }
-th { color: var(--forest); font-weight: 600; font-size: 13px; text-transform: uppercase; letter-spacing: 0.05em; }
-td code { font-size: 0.92em; background: var(--cream-2); padding: 0.15em 0.45em; border-radius: 3px; color: var(--forest); }
-td em { color: var(--moss); font-style: normal; font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; }
+.ledger td { padding: 0.48rem 0.6rem; border-bottom: 1px solid var(--hairline-2); }
+.ledger tr { transition: background .2s var(--ease); }
+.ledger tbody tr:hover { background: rgba(92, 128, 82, 0.07); }
+.ledger .no { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--ink-faint); }
+.ledger code { font-size: 12.5px; color: var(--forest); }
+.ledger .def { color: var(--moss); font-style: italic; font-size: 0.85em; }
+.entries { display: flex; flex-direction: column; gap: 1.15rem; }
+.entry { display: grid; grid-template-columns: 56px 1fr; gap: 1rem; align-items: baseline; }
+.entry .num {
+    font-family: 'Fraunces', serif; font-style: italic; font-weight: 340;
+    font-size: 2.1rem; color: rgba(31, 58, 42, 0.34); line-height: 1;
+}
+.entry h3 { font-family: 'EB Garamond', serif; font-weight: 600; font-size: 1.12rem; color: var(--forest); }
+.entry p { font-size: 0.96rem; color: var(--ink-soft); margin-top: 0.15rem; }
+.entry code { font-size: 0.84em; background: rgba(26,38,34,0.07); padding: 0.06em 0.35em; }
 
-/* Quote */
-blockquote {
-    background: var(--forest);
-    color: var(--cream);
-    padding: 2rem 2.25rem;
-    border-radius: 8px;
-    margin: 2rem 0;
-    font-family: 'EB Garamond', Georgia, serif;
-    font-size: 1.15rem;
-    line-height: 1.55;
-    font-style: italic;
-    position: relative;
-    box-shadow: var(--shadow-md);
+/* ============ PLATE IV — the oath / colophon ============ */
+.oath-wrap { width: min(860px, 100%); text-align: center; }
+.oath {
+    font-family: 'Fraunces', serif; font-weight: 350; font-style: italic;
+    font-size: clamp(1.5rem, 3.1vw, 2.3rem); line-height: 1.42;
+    color: var(--forest);
 }
-blockquote::before {
-    content: '"';
-    position: absolute;
-    top: -0.5rem; left: 1rem;
-    font-size: 4rem;
-    color: var(--moss-2);
-    font-style: normal;
-    line-height: 1;
+.oath .drop {
+    float: none; font-size: 1.6em; color: var(--moss);
 }
-blockquote strong { color: var(--moss-2); font-style: normal; }
-blockquote code { background: rgba(244, 241, 232, 0.15); padding: 0.1em 0.4em; border-radius: 3px; font-size: 0.85em; }
+.oath strong { font-weight: 600; font-style: normal; color: var(--ink); }
+.oath-note { margin-top: 1.4rem; font-size: 1rem; color: var(--ink-soft); font-style: italic; }
+.colophon { margin-top: 2.6rem; padding-top: 1.6rem; border-top: 1px solid var(--hairline); }
+.colophon .bird { width: 56px; opacity: 0.85; margin-bottom: 0.9rem; }
+.colophon .links { display: flex; gap: 1.6rem; justify-content: center; flex-wrap: wrap; font-size: 0.98rem; }
+.colophon .fine { margin-top: 1rem; font-size: 0.85rem; color: var(--ink-faint); font-style: italic; }
 
-/* Footer */
-footer {
-    text-align: center;
-    color: var(--sage);
-    font-size: 14px;
-    padding: 3.5rem 1.5rem 4rem;
-    border-top: 1px solid var(--cream-2);
-    margin-top: 4rem;
+/* Faint engraved bird watermark behind plates II-IV */
+.watermark {
+    position: absolute; z-index: 0; pointer-events: none;
+    width: 56vmin; opacity: 0.05;
+    filter: grayscale(1) contrast(1.3);
 }
-footer .bird {
-    width: 64px; height: 64px;
-    opacity: 0.6;
-    margin-bottom: 1rem;
-}
-footer a { color: var(--sage); margin: 0 0.5rem; }
-footer a:hover { color: var(--forest); }
+.plate-2 .watermark { right: -6vmin; bottom: -4vmin; transform: rotate(6deg); }
+.plate-3 .watermark { left: -8vmin; top: 4vmin; transform: rotate(-8deg) scaleX(-1); }
+.plate-4 .watermark { right: 50%; bottom: -10vmin; transform: translateX(50%); width: 70vmin; opacity: 0.04; }
+.plate-z { position: relative; z-index: 2; }
 
-/* Reveal animation */
-.reveal {
-    opacity: 0;
-    transform: translateY(20px);
-    transition: opacity 0.7s var(--ease-out), transform 0.7s var(--ease-out);
+@media (max-width: 880px) {
+    section.plate { padding: 4.2rem 1.4rem 3rem; height: auto; min-height: 100vh; }
+    .hero-grid, .tax { grid-template-columns: 1fr; gap: 2rem; }
+    .specimen { max-width: 420px; margin: 0 auto; }
+    .marginalia, .plate-frame { display: none; }
+    .masthead { left: 1.2rem; right: 1.2rem; }
+    .numerals { right: 10px; }
+    .terminal { display: none; }
 }
-.reveal.visible { opacity: 1; transform: translateY(0); }
-
-@media (max-width: 640px) {
-    .nav { padding: 0.75rem 1.25rem; }
-    .nav .links { gap: 0.9rem; font-size: 13px; }
-    .terminal-body { padding: 1.25rem 1.25rem; font-size: 12.5px; }
-    .copy-block { font-size: 13px; padding: 1rem 3.5rem 1rem 1rem; }
-}
-
 @media (prefers-reduced-motion: reduce) {
-    .reveal { opacity: 1; transform: none; transition: none; }
-    .hero .logo-wrap { animation: none; }
-    .cursor { animation: none; }
+    .pages { scroll-behavior: auto; }
+    .reveal { opacity: 1 !important; transform: none !important; transition: none; }
+    .caret, .t-caret { animation: none; }
+    .specimen { transform: none; }
 }
 </style>
 </head>
 <body>
 
-<nav class="nav" id="nav">
-    <div class="brand">
-        <img src="brand/2-mark.png" alt="">
-        <span>Knightingale</span>
-    </div>
-    <div class="links">
-        <a href="#install">Install</a>
-        <a href="#providers">Providers</a>
-        <a href="#privacy">Privacy</a>
+<div class="plate-frame" aria-hidden="true">
+    <span class="corner tl"></span><span class="corner tr"></span>
+    <span class="corner bl"></span><span class="corner br"></span>
+</div>
+
+<header class="masthead">
+    <span>Knightingale · a field guide to dictation</span>
+    <nav class="links">
+        <a href="#plate-2">Acquire</a>
+        <a href="#plate-3">Taxonomy</a>
+        <a href="#plate-4">Oath</a>
         <a href="https://github.com/ShatilKhan/knightingale">GitHub</a>
-    </div>
-</nav>
-
-<header class="hero">
-    <div class="logo-wrap">
-        <img class="logo" src="brand/1-readme.png" alt="Knightingale">
-    </div>
-    <h1>Knightingale</h1>
-    <p class="tagline">Voice dictation that minds its own business.</p>
-
-    <div class="badge-row">
-        <a href="https://github.com/ShatilKhan/knightingale/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/ShatilKhan/knightingale?style=flat-square&color=2D4A3E"></a>
-        <a href="https://github.com/ShatilKhan/knightingale/releases/latest"><img alt="release" src="https://img.shields.io/github/v/release/ShatilKhan/knightingale?style=flat-square&color=5C8052"></a>
-        <a href="https://github.com/ShatilKhan/knightingale/actions/workflows/ci.yml"><img alt="ci" src="https://img.shields.io/github/actions/workflow/status/ShatilKhan/knightingale/ci.yml?style=flat-square"></a>
-        <img alt="license" src="https://img.shields.io/github/license/ShatilKhan/knightingale?style=flat-square">
-        <img alt="hits" src="https://hits.sh/github.com/ShatilKhan/knightingale.svg?style=flat-square&color=2D4A3E">
-    </div>
-
-    <div class="cta-row">
-        <a class="cta" href="#install">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="8 17 12 21 16 17"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.88 18.09A5 5 0 0 0 18 9h-1.26A8 8 0 1 0 3 16.29"/></svg>
-            Install
-        </a>
-        <a class="cta secondary" href="https://github.com/ShatilKhan/knightingale">
-            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12c0 5.3 3.4 9.8 8.2 11.4.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.8 1.2 1.8 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2 1-.3 2-.4 3-.4s2 .1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.7 1.7.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v3.3c0 .3.2.7.8.6C20.6 21.8 24 17.3 24 12c0-6.6-5.4-12-12-12z"/></svg>
-            Source
-        </a>
-    </div>
+    </nav>
 </header>
 
-<section class="terminal-section">
-    <div class="terminal">
-        <div class="terminal-header">
-            <span class="terminal-dot red"></span>
-            <span class="terminal-dot yellow"></span>
-            <span class="terminal-dot green"></span>
-            <span class="terminal-title">knightingale demo</span>
-        </div>
-        <div class="terminal-body" id="termBody">
-            <span class="prompt">$</span> <span class="cmd" id="termCmd"></span><span class="cursor" id="termCursor"></span>
-            <span class="out" id="termOut"></span>
-        </div>
-    </div>
-</section>
+<nav class="numerals" aria-label="Plates">
+    <button class="numeral active" data-target="0">I</button>
+    <button class="numeral" data-target="1">II</button>
+    <button class="numeral" data-target="2">III</button>
+    <button class="numeral" data-target="3">IV</button>
+</nav>
 
-<section class="section" id="install">
-    <span class="eyebrow reveal">Install</span>
-    <h2 class="reveal">One command. No clone. No compile.</h2>
-    <p class="lead reveal">Prebuilt binaries for Linux, Windows, and macOS. SHA-256 sums signed with sigstore.</p>
+<main class="pages" id="pages">
 
-    <div class="reveal">
-        <div class="tabs" role="tablist">
-            <button class="tab active" data-tab="curl">curl</button>
-            <button class="tab" data-tab="cargo">cargo</button>
-            <button class="tab" data-tab="brew">brew</button>
-            <button class="tab" data-tab="scoop">scoop</button>
+    <!-- ============ PLATE I ============ -->
+    <section class="plate plate-1 active" id="plate-1">
+        <div class="plate-label">Plate I · The Specimen</div>
+        <span class="marginalia left">rec. 06.vi.2026 · 04:12 · dawn chorus · RTF 0.4</span>
+        <span class="marginalia right2">spec. № v0.1.0 · MIT</span>
+        <div class="hero-grid">
+            <div>
+                <h1 class="title reveal">Knightingale</h1>
+                <p class="taxonomy reveal d1">
+                    Luscinia megarhynchos <span class="sep">·</span>
+                    <span class="fam">fam.</span> Muscicapidae <span class="sep">·</span>
+                    <span class="fam">ord.</span> Dictation Daemons
+                </p>
+                <div class="sonogram-card reveal d2">
+                    <div class="scale"><span>8k</span><span>4k</span><span>1k</span></div>
+                    <canvas id="sono" width="1200" height="220"></canvas>
+                    <div class="axis"><span>0.0s</span><span>field recording — nightingale song, transcribed below</span><span>6.0s</span></div>
+                </div>
+                <p class="transcription reveal d3"><span class="prompt">&gt;</span> <span id="trans"></span><span class="caret"></span></p>
+                <div class="cta-row reveal d4">
+                    <button class="cta" data-jump="1">Acquire the specimen</button>
+                    <a class="cta ghost" href="https://github.com/ShatilKhan/knightingale">View source</a>
+                </div>
+                <div class="badge-row reveal d4">
+                    <a href="https://github.com/ShatilKhan/knightingale/stargazers"><img alt="stars" src="https://img.shields.io/github/stars/ShatilKhan/knightingale?style=flat-square&color=2D4A3E"></a>
+                    <a href="https://github.com/ShatilKhan/knightingale/releases/latest"><img alt="release" src="https://img.shields.io/github/v/release/ShatilKhan/knightingale?style=flat-square&color=5C8052"></a>
+                    <a href="https://github.com/ShatilKhan/knightingale/actions/workflows/ci.yml"><img alt="ci" src="https://img.shields.io/github/actions/workflow/status/ShatilKhan/knightingale/ci.yml?style=flat-square"></a>
+                </div>
+            </div>
+            <figure class="specimen reveal d2" data-parallax="0.25">
+                <span class="tape t1"></span><span class="tape t2"></span>
+                <div class="mount"><img src="img/section-1.jpg" alt="Nightingale at rest among branches, duotone plate"></div>
+                <figcaption class="fig">fig. 1 — <em>at rest; listens more than it speaks.</em></figcaption>
+            </figure>
         </div>
+    </section>
 
-        <div class="tab-content active" data-content="curl">
-            <div class="copy-block">
-                <span>curl -fsSL https://shatilkhan.github.io/knightingale/install.sh | sh</span>
-                <button class="copy-btn" data-copy="curl -fsSL https://shatilkhan.github.io/knightingale/install.sh | sh">Copy</button>
+    <!-- ============ PLATE II ============ -->
+    <section class="plate plate-2" id="plate-2">
+        <div class="plate-label">Plate II · Acquisition</div>
+        <img class="watermark" src="brand/2-mark.png" alt="" data-parallax="0.15">
+        <span class="marginalia left">habitat: linux · windows · macos</span>
+        <div class="acq plate-z">
+            <h2 class="plate-h reveal">One command. <em>No clone, no compile.</em></h2>
+            <p class="lead reveal d1">Prebuilt binaries for every habitat. Checksums signed with sigstore. The daemon weighs 15–30&nbsp;MB and sleeps at 10–40&nbsp;MB resident.</p>
+            <div class="reveal d2">
+                <div class="tabs" role="tablist">
+                    <button class="tab active" data-tab="curl">curl</button>
+                    <button class="tab" data-tab="cargo">cargo</button>
+                    <button class="tab" data-tab="brew">brew</button>
+                    <button class="tab" data-tab="scoop">scoop</button>
+                </div>
+                <div class="tab-content active" data-content="curl">
+                    <div class="copy-block"><span>curl -fsSL https://shatilkhan.github.io/knightingale/install.sh | sh</span><button class="copy-btn" data-copy="curl -fsSL https://shatilkhan.github.io/knightingale/install.sh | sh">copy</button></div>
+                </div>
+                <div class="tab-content" data-content="cargo">
+                    <div class="copy-block"><span>cargo install knightingale</span><button class="copy-btn" data-copy="cargo install knightingale">copy</button></div>
+                </div>
+                <div class="tab-content" data-content="brew">
+                    <div class="copy-block"><span>brew install ShatilKhan/tap/knightingale</span><button class="copy-btn" data-copy="brew install ShatilKhan/tap/knightingale">copy</button></div>
+                </div>
+                <div class="tab-content" data-content="scoop">
+                    <div class="copy-block"><span>scoop install https://raw.githubusercontent.com/ShatilKhan/knightingale/main/packaging/scoop/knightingale.json</span><button class="copy-btn" data-copy="scoop install https://raw.githubusercontent.com/ShatilKhan/knightingale/main/packaging/scoop/knightingale.json">copy</button></div>
+                </div>
             </div>
-        </div>
-        <div class="tab-content" data-content="cargo">
-            <div class="copy-block">
-                <span>cargo install knightingale</span>
-                <button class="copy-btn" data-copy="cargo install knightingale">Copy</button>
-            </div>
-        </div>
-        <div class="tab-content" data-content="brew">
-            <div class="copy-block">
-                <span>brew install ShatilKhan/tap/knightingale</span>
-                <button class="copy-btn" data-copy="brew install ShatilKhan/tap/knightingale">Copy</button>
-            </div>
-        </div>
-        <div class="tab-content" data-content="scoop">
-            <div class="copy-block">
-                <span>scoop install https://raw.githubusercontent.com/ShatilKhan/knightingale/main/packaging/scoop/knightingale.json</span>
-                <button class="copy-btn" data-copy="scoop install https://raw.githubusercontent.com/ShatilKhan/knightingale/main/packaging/scoop/knightingale.json">Copy</button>
-            </div>
-        </div>
-    </div>
-
-    <p class="lead reveal" style="margin-top: 2rem;">Then:</p>
-    <div class="copy-block reveal">
-        <span>knightingale setup && knightingale toggle</span>
-        <button class="copy-btn" data-copy="knightingale setup && knightingale toggle">Copy</button>
-    </div>
-</section>
-
-<section class="section alt">
-    <div class="inner">
-        <span class="eyebrow reveal">Why</span>
-        <h2 class="reveal">A daemon, not a desktop app.</h2>
-        <p class="lead reveal">15–30 MB binary, 10–40 MB resident memory. Hits your hotkey, captures the mic, transcribes, types. That's it.</p>
-
-        <div class="feature-grid">
-            <div class="feature reveal">
-                <div class="icon">∞</div>
-                <h3>Bring your own key</h3>
-                <p>Eight providers share one HTTP shape: <code>groq</code>, <code>openai</code>, <code>deepinfra</code>, <code>fireworks</code>, <code>lemonfox</code>, <code>sambanova</code>, <code>azure</code>, and any custom OpenAI-compatible server.</p>
-            </div>
-            <div class="feature reveal">
-                <div class="icon">⌖</div>
-                <h3>Or run it locally</h3>
-                <p>whisper.cpp via <code>whisper-rs</code> with <code>vulkan</code>, <code>cuda</code>, and <code>metal</code> feature flags. The <code>distil-small.en</code> default fits 4 GB VRAM laptops; <code>large-v3-turbo</code> on RTX-class is real-time.</p>
-            </div>
-            <div class="feature reveal">
-                <div class="icon">⊟</div>
-                <h3>Tiny</h3>
-                <p>Single static Rust binary. No Electron. No Chromium. No Python. The whole project is ~14k lines including the design system.</p>
-            </div>
-            <div class="feature reveal">
-                <div class="icon">⌘</div>
-                <h3>Cross-platform</h3>
-                <p>Linux (X11 + Wayland), Windows, macOS — one binary per arch. Hotkey, audio, and text injection abstracted behind <code>cpal</code>, <code>global-hotkey</code>, and <code>enigo</code>.</p>
-            </div>
-            <div class="feature reveal">
-                <div class="icon">⊘</div>
-                <h3>No telemetry</h3>
-                <p>Zero outbound calls besides the STT endpoint <em>you</em> configured. No analytics, no crash reports, no phone-home. Grep the source for <code>reqwest</code> — there's exactly one HTTP client.</p>
-            </div>
-            <div class="feature reveal">
-                <div class="icon">♢</div>
-                <h3>Smart defaults</h3>
-                <p><code>knightingale model recommend</code> reads your CPU, RAM, and GPU then picks the right Whisper checkpoint for the hardware it's running on.</p>
+            <div class="terminal reveal d3">
+                <div class="terminal-header"><span>field recorder</span><span>tty</span></div>
+                <div class="terminal-body"><span class="prompt">$</span> <span id="termCmd"></span><span class="t-caret"></span><span id="termOut"></span></div>
             </div>
         </div>
-    </div>
-</section>
+    </section>
 
-<section class="section" id="providers">
-    <span class="eyebrow reveal">Providers</span>
-    <h2 class="reveal">Pick a cloud or stay local.</h2>
-    <p class="lead reveal">Same <code>/v1/audio/transcriptions</code> shape across the board. Swap providers by editing one env var.</p>
+    <!-- ============ PLATE III ============ -->
+    <section class="plate plate-3" id="plate-3">
+        <div class="plate-label">Plate III · Taxonomy of Providers</div>
+        <img class="watermark" src="brand/2-mark.png" alt="" data-parallax="0.15">
+        <span class="marginalia left">one http shape · /v1/audio/transcriptions</span>
+        <div class="tax plate-z">
+            <div>
+                <h2 class="plate-h reveal">Nine species, <em>one genus.</em></h2>
+                <p class="lead reveal d1">Pick a cloud or stay local — swap providers by editing one variable.</p>
+                <div class="entries" style="margin-top:1.6rem">
+                    <div class="entry reveal d2"><span class="num">i.</span><div><h3>Bring your own key</h3><p>Groq, OpenAI, Deepinfra, Fireworks, Lemonfox, SambaNova, Azure — or any self-hosted OpenAI-compatible server.</p></div></div>
+                    <div class="entry reveal d3"><span class="num">ii.</span><div><h3>Or run it on-device</h3><p>whisper.cpp via <code>whisper-rs</code>; vulkan, cuda, and metal flags. <code>tiny.en</code> is real-time on CPU.</p></div></div>
+                    <div class="entry reveal d4"><span class="num">iii.</span><div><h3>Smart defaults</h3><p><code>knightingale model recommend</code> reads your CPU, RAM, GPU and names the right checkpoint for the machine it's on.</p></div></div>
+                </div>
+            </div>
+            <div class="ledger reveal d2">
+                <table>
+                    <thead><tr><th>№</th><th>Provider</th><th>Default model</th></tr></thead>
+                    <tbody>
+                        <tr><td class="no">01</td><td><code>groq</code> <span class="def">type sp.</span></td><td>whisper-large-v3-turbo</td></tr>
+                        <tr><td class="no">02</td><td><code>openai</code></td><td>whisper-1</td></tr>
+                        <tr><td class="no">03</td><td><code>deepinfra</code></td><td>whisper-large-v3-turbo</td></tr>
+                        <tr><td class="no">04</td><td><code>fireworks</code></td><td>whisper-v3-turbo</td></tr>
+                        <tr><td class="no">05</td><td><code>lemonfox</code></td><td>whisper-1</td></tr>
+                        <tr><td class="no">06</td><td><code>sambanova</code></td><td>Whisper-Large-v3</td></tr>
+                        <tr><td class="no">07</td><td><code>azure</code></td><td>per deployment</td></tr>
+                        <tr><td class="no">08</td><td><code>custom</code></td><td>self-hosted</td></tr>
+                        <tr><td class="no">09</td><td><code>local</code></td><td>whisper.cpp on-device</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
 
-    <table class="reveal">
-        <thead><tr><th>Provider</th><th>Env prefix</th><th>Default model</th></tr></thead>
-        <tbody>
-            <tr><td><code>groq</code> <em>default</em></td><td><code>GROQ_*</code></td><td>whisper-large-v3-turbo</td></tr>
-            <tr><td><code>openai</code></td><td><code>OPENAI_*</code></td><td>whisper-1</td></tr>
-            <tr><td><code>deepinfra</code></td><td><code>DEEPINFRA_*</code></td><td>openai/whisper-large-v3-turbo</td></tr>
-            <tr><td><code>fireworks</code></td><td><code>FIREWORKS_*</code></td><td>whisper-v3-turbo</td></tr>
-            <tr><td><code>lemonfox</code></td><td><code>LEMONFOX_*</code></td><td>whisper-1</td></tr>
-            <tr><td><code>sambanova</code></td><td><code>SAMBANOVA_*</code></td><td>Whisper-Large-v3</td></tr>
-            <tr><td><code>azure</code></td><td><code>AZURE_OPENAI_*</code></td><td>per deployment</td></tr>
-            <tr><td><code>custom</code></td><td><code>CUSTOM_*</code></td><td>self-hosted (Speaches / vLLM / LocalAI)</td></tr>
-            <tr><td><code>local</code></td><td>—</td><td>whisper.cpp on-device</td></tr>
-        </tbody>
-    </table>
-</section>
+    <!-- ============ PLATE IV ============ -->
+    <section class="plate plate-4" id="plate-4">
+        <div class="plate-label">Plate IV · The Collector's Oath</div>
+        <img class="watermark" src="brand/2-mark.png" alt="" data-parallax="0.1">
+        <div class="oath-wrap plate-z">
+            <p class="oath reveal"><span class="drop">“</span>No telemetry of any kind. No metrics, no analytics, no phone-home. Audio is sent <strong>only</strong> to the endpoint you configured, with your key, and nowhere else.<span class="drop">”</span></p>
+            <p class="oath-note reveal d1">— sworn in the source; grep it for <code class="mono" style="font-style:normal;font-size:0.85em">reqwest</code> and count one client.</p>
+            <div class="colophon reveal d2">
+                <img class="bird" src="brand/2-mark.png" alt="">
+                <div class="links">
+                    <a href="https://github.com/ShatilKhan/knightingale/blob/main/README.md">README</a>
+                    <a href="https://github.com/ShatilKhan/knightingale/blob/main/docs/ARCHITECTURE.md">Architecture</a>
+                    <a href="https://github.com/ShatilKhan/knightingale/releases">Releases</a>
+                    <a href="https://github.com/ShatilKhan/knightingale/issues">Issues</a>
+                    <a href="install.sh">install.sh</a>
+                </div>
+                <p class="fine">© Shatil Khan · MIT licensed · set in Fraunces &amp; EB Garamond · no birds were digitised without affection</p>
+            </div>
+        </div>
+    </section>
 
-<section class="section alt" id="privacy">
-    <div class="inner">
-        <span class="eyebrow reveal">Privacy</span>
-        <h2 class="reveal">Your audio doesn't leave the bird.</h2>
-
-        <blockquote class="reveal">
-            Knightingale does not collect or transmit telemetry of any kind. No usage metrics, no error reports, no analytics, no phone-home. Your audio, transcripts, and configuration stay on your machine unless you explicitly point Knightingale at a cloud provider — in which case audio is sent <strong>only</strong> to the API endpoint configured in your <code>.env</code>, with your key, and nowhere else.
-        </blockquote>
-    </div>
-</section>
-
-<section class="section">
-    <span class="eyebrow reveal">Documentation</span>
-    <h2 class="reveal">Read more.</h2>
-    <p class="lead reveal">The plan, decision log, and full architecture writeup live in the open.</p>
-    <div class="feature-grid reveal">
-        <a class="feature" href="https://github.com/ShatilKhan/knightingale/blob/main/README.md">
-            <div class="icon">≡</div>
-            <h3>README</h3>
-            <p>Provider table, local model menu, CLI reference, install instructions.</p>
-        </a>
-        <a class="feature" href="https://github.com/ShatilKhan/knightingale/blob/main/docs/ARCHITECTURE.md">
-            <div class="icon">◯</div>
-            <h3>Architecture</h3>
-            <p>Module-by-module tour: audio, STT, IPC, injection, hotkey, status, daemon main loop.</p>
-        </a>
-        <a class="feature" href="https://github.com/ShatilKhan/cuntxt/blob/main/knightingale/PLAN.md">
-            <div class="icon">⌥</div>
-            <h3>Plan log</h3>
-            <p>Every architectural decision, dated, with the reasoning. Open for review.</p>
-        </a>
-    </div>
-</section>
-
-<footer>
-    <img src="brand/2-mark.png" alt="" class="bird">
-    <p>© Shatil Khan · MIT licensed</p>
-    <p>
-        <a href="https://github.com/ShatilKhan/knightingale">GitHub</a>·
-        <a href="https://github.com/ShatilKhan/knightingale/issues">Issues</a>·
-        <a href="https://github.com/ShatilKhan/knightingale/releases">Releases</a>·
-        <a href="https://shatilkhan.github.io/knightingale/install.sh">install.sh</a>
-    </p>
-</footer>
+</main>
 
 <script>
-// Sticky nav background on scroll
-const nav = document.getElementById('nav');
-const onScroll = () => {
-    if (window.scrollY > 60) nav.classList.add('scrolled');
-    else nav.classList.remove('scrolled');
-};
-window.addEventListener('scroll', onScroll, { passive: true });
+const pagesEl = document.getElementById('pages');
+const plates = Array.from(document.querySelectorAll('section.plate'));
+const numerals = Array.from(document.querySelectorAll('.numeral'));
+const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
 
-// Scroll reveal
-const io = new IntersectionObserver((entries) => {
-    for (const e of entries) {
+function jumpTo(i) { plates[i].scrollIntoView({ behavior: reduced ? 'auto' : 'smooth' }); }
+numerals.forEach(n => n.addEventListener('click', () => jumpTo(+n.dataset.target)));
+document.querySelectorAll('[data-jump]').forEach(b => b.addEventListener('click', () => jumpTo(+b.dataset.jump)));
+
+const io = new IntersectionObserver(entries => {
+    entries.forEach(e => {
         if (e.isIntersecting) {
-            e.target.classList.add('visible');
-            io.unobserve(e.target);
+            const idx = plates.indexOf(e.target);
+            plates.forEach((p, i) => p.classList.toggle('active', i === idx));
+            numerals.forEach((n, i) => n.classList.toggle('active', i === idx));
         }
-    }
-}, { threshold: 0.12 });
-document.querySelectorAll('.reveal').forEach(el => io.observe(el));
+    });
+}, { root: pagesEl, threshold: 0.55 });
+plates.forEach(p => io.observe(p));
 
-// Install tabs
+/* Parallax on specimens + watermarks */
+if (!reduced) {
+    let ticking = false;
+    pagesEl.addEventListener('scroll', () => {
+        if (ticking) return; ticking = true;
+        requestAnimationFrame(() => {
+            const st = pagesEl.scrollTop, vh = window.innerHeight;
+            plates.forEach((p, i) => {
+                const off = st - i * vh;
+                if (Math.abs(off) <= vh) {
+                    p.querySelectorAll('[data-parallax]').forEach(el => {
+                        const f = parseFloat(el.dataset.parallax);
+                        const base = el.classList.contains('specimen') ? ' rotate(-1.6deg)' : '';
+                        el.style.transform = `translateY(${off * f}px)` + base;
+                    });
+                }
+            });
+            ticking = false;
+        });
+    }, { passive: true });
+}
+
+/* Tabs */
 document.querySelectorAll('.tab').forEach(tab => {
     tab.addEventListener('click', () => {
-        const target = tab.dataset.tab;
         document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', t === tab));
-        document.querySelectorAll('.tab-content').forEach(c => {
-            c.classList.toggle('active', c.dataset.content === target);
-        });
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.toggle('active', c.dataset.content === tab.dataset.tab));
     });
 });
 
-// Copy buttons
+/* Copy buttons */
 document.querySelectorAll('.copy-btn').forEach(btn => {
     btn.addEventListener('click', async () => {
         try {
             await navigator.clipboard.writeText(btn.dataset.copy);
-            const orig = btn.textContent;
-            btn.textContent = '✓ Copied';
-            btn.classList.add('copied');
-            setTimeout(() => {
-                btn.textContent = orig;
-                btn.classList.remove('copied');
-            }, 1400);
-        } catch (e) { /* swallow */ }
+            const o = btn.textContent;
+            btn.textContent = '✓'; btn.classList.add('copied');
+            setTimeout(() => { btn.textContent = o; btn.classList.remove('copied'); }, 1200);
+        } catch (e) {}
     });
 });
 
-// Terminal typewriter demo
-const cmdEl = document.getElementById('termCmd');
-const outEl = document.getElementById('termOut');
-const cursor = document.getElementById('termCursor');
-const sequence = [
-    { type: 'cmd', text: 'knightingale toggle', delay: 1100 },
-    { type: 'out', text: '<span class="warn">●</span> Recording…' , delay: 1900 },
-    { type: 'cmd', text: 'knightingale toggle', delay: 1100 },
-    { type: 'out', text: '<span class="accent">◌</span> Transcribing…', delay: 900 },
-    { type: 'out', text: '<span class="accent">✓</span> Done <span style="color:rgba(244,241,232,0.3)">(932 ms)</span>', delay: 2200 },
-];
-let idx = 0;
-function tickType(text, i, done) {
-    if (i >= text.length) { setTimeout(done, 300); return; }
-    cmdEl.textContent = text.slice(0, i + 1);
-    setTimeout(() => tickType(text, i + 1, done), 35 + Math.random() * 25);
-}
-function step() {
-    const s = sequence[idx % sequence.length];
-    if (s.type === 'cmd') {
-        cmdEl.textContent = '';
-        tickType(s.text, 0, () => {
-            setTimeout(() => {
-                outEl.innerHTML += `\n<span class="prompt">$</span> ${cmdEl.textContent}\n`;
-                cmdEl.textContent = '';
-                idx++;
-                setTimeout(step, 250);
-            }, s.delay);
+/* ============ Sonogram: ink chirps on paper ============ */
+const sono = document.getElementById('sono');
+const sctx = sono.getContext('2d');
+const W = sono.width, H = sono.height;
+const ink = 'rgba(31, 58, 42, 0.85)';
+let marks = [];      // {x, y, len, arc, w}
+let tNext = 0;
+function spawnPhrase() {
+    // A nightingale phrase: 3–9 rapid chirps in a frequency band, then silence.
+    const n = 3 + Math.floor(Math.random() * 7);
+    const band = 30 + Math.random() * (H - 90);
+    let x = W + 10;
+    for (let i = 0; i < n; i++) {
+        const len = 14 + Math.random() * 30;
+        marks.push({
+            x, y: band + (Math.random() - 0.5) * 26,
+            len, arc: (Math.random() - 0.5) * 24,
+            w: 1.6 + Math.random() * 2.2,
         });
-    } else {
-        outEl.innerHTML += s.text + '\n';
-        idx++;
-        if (idx >= sequence.length) {
-            setTimeout(() => {
-                outEl.innerHTML = '';
-                idx = 0;
-                step();
-            }, 3200);
-        } else {
-            setTimeout(step, s.delay);
-        }
+        x += len + 6 + Math.random() * 10;
     }
 }
-// Kick off after a beat.
-setTimeout(step, 800);
+function drawSono() {
+    sctx.clearRect(0, 0, W, H);
+    sctx.lineCap = 'round';
+    marks.forEach(m => {
+        sctx.strokeStyle = ink;
+        sctx.lineWidth = m.w;
+        sctx.beginPath();
+        sctx.moveTo(m.x, m.y);
+        sctx.quadraticCurveTo(m.x + m.len / 2, m.y + m.arc, m.x + m.len, m.y - m.arc * 0.4);
+        sctx.stroke();
+    });
+}
+function tickSono(ts) {
+    if (!reduced) {
+        marks.forEach(m => m.x -= 1.6);
+        marks = marks.filter(m => m.x + m.len > -20);
+        if (ts > tNext) {
+            spawnPhrase();
+            tNext = ts + 900 + Math.random() * 1800;   // song … pause … song
+        }
+        drawSono();
+    }
+    requestAnimationFrame(tickSono);
+}
+spawnPhrase(); drawSono();
+requestAnimationFrame(tickSono);
+
+/* Transcription typewriter under the sonogram */
+const trans = document.getElementById('trans');
+const lines = [
+    'voice dictation that minds its own business.',
+    'tap the hotkey. speak. it types. that’s the whole song.',
+    'no telemetry — the bird keeps your secrets.',
+];
+let li = 0;
+function typeLine(text, i, done) {
+    if (reduced) { trans.textContent = text; return; }
+    if (i > text.length) { setTimeout(done, 2600); return; }
+    trans.textContent = text.slice(0, i);
+    setTimeout(() => typeLine(text, i + 1, done), 34 + Math.random() * 30);
+}
+function nextLine() {
+    typeLine(lines[li % lines.length], 0, () => {
+        // erase quickly
+        const t = lines[li % lines.length];
+        let j = t.length;
+        const erase = () => {
+            if (j < 0) { li++; setTimeout(nextLine, 350); return; }
+            trans.textContent = t.slice(0, j--);
+            setTimeout(erase, 9);
+        };
+        erase();
+    });
+}
+nextLine();
+
+/* Field-recorder demo */
+const cmdEl = document.getElementById('termCmd');
+const outEl = document.getElementById('termOut');
+const seq = [
+    { t: 'cmd', s: 'knightingale toggle', d: 950 },
+    { t: 'out', s: '\n<span class="warn">●</span> Recording…', d: 1500 },
+    { t: 'cmd', s: 'knightingale toggle', d: 850 },
+    { t: 'out', s: '\n<span class="ok">◌</span> Transcribing…', d: 750 },
+    { t: 'out', s: '\n<span class="ok">✓</span> Done <span style="opacity:.45">(932 ms)</span>', d: 2300 },
+];
+let si = 0;
+function typeCmd(text, i, done) {
+    if (i >= text.length) { setTimeout(done, 220); return; }
+    cmdEl.textContent = text.slice(0, i + 1);
+    setTimeout(() => typeCmd(text, i + 1, done), 32 + Math.random() * 26);
+}
+function stepTerm() {
+    const s = seq[si];
+    if (s.t === 'cmd') {
+        cmdEl.textContent = '';
+        typeCmd(s.s, 0, () => setTimeout(() => {
+            outEl.innerHTML += '\n$ ' + cmdEl.textContent;
+            cmdEl.textContent = '';
+            si++; setTimeout(stepTerm, 180);
+        }, s.d));
+    } else {
+        outEl.innerHTML += s.s;
+        si++;
+        if (si >= seq.length) setTimeout(() => { outEl.innerHTML = ''; si = 0; stepTerm(); }, 2800);
+        else setTimeout(stepTerm, s.d);
+    }
+}
+if (!reduced) setTimeout(stepTerm, 600);
 </script>
 </body>
 </html>
