@@ -84,30 +84,26 @@ code, pre, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 .masthead a { border: none; color: var(--ink-soft); }
 .masthead a:hover { color: var(--forest); }
 
-/* ============ Right-edge plate numerals (the page dots) ============ */
+/* ============ Right-edge dots (draft style: elongating pill) ============ */
 .numerals {
     position: fixed; right: 26px; top: 50%; transform: translateY(-50%);
-    z-index: 96; display: flex; flex-direction: column; gap: 0.9rem; align-items: center;
+    z-index: 96; display: flex; flex-direction: column; gap: 0.85rem; align-items: center;
     background: rgba(244, 241, 232, 0.92);
     border: 1px solid var(--hairline-2);
-    padding: 0.6rem 0.3rem;
+    padding: 0.7rem 0.45rem;
 }
 .numeral {
-    font-family: 'EB Garamond', serif; font-size: 13px; letter-spacing: 0.08em;
-    color: var(--ink-faint);
-    background: none; border: none; cursor: pointer;
-    padding: 2px 6px;
-    position: relative;
-    transition: color .35s var(--ease);
+    width: 8px; height: 8px; border-radius: 8px;
+    background: rgba(26, 38, 34, 0.28);
+    border: none; cursor: pointer; padding: 0;
+    transition: height .45s var(--ease), background .45s var(--ease), box-shadow .45s var(--ease);
 }
-.numeral::after {
-    content: ''; position: absolute; left: 50%; bottom: -3px;
-    width: 0; height: 1.5px; background: var(--moss);
-    transform: translateX(-50%);
-    transition: width .4s var(--ease);
+.numeral:hover { background: rgba(26, 38, 34, 0.55); }
+.numeral.active {
+    height: 30px;
+    background: var(--moss);
+    box-shadow: 0 0 10px rgba(92, 128, 82, 0.4);
 }
-.numeral.active { color: var(--forest); font-weight: 600; }
-.numeral.active::after { width: 100%; }
 
 /* ============ Scroll container ============ */
 .pages { height: 100vh; overflow-y: scroll; scroll-snap-type: y mandatory; scroll-behavior: smooth; scrollbar-width: none; position: relative; z-index: 1; }
@@ -193,8 +189,19 @@ h1.title {
     margin-top: 0.8rem;
     font-family: 'JetBrains Mono', monospace; font-size: 13.5px;
     color: var(--ink-soft); min-height: 1.5em;
+    display: flex; align-items: baseline; gap: 0.55em;
 }
 .transcription .prompt { color: var(--moss); }
+.status-chip {
+    font-size: 10.5px; letter-spacing: 0.08em;
+    padding: 0.18em 0.55em;
+    border: 1px solid var(--hairline);
+    color: var(--ink-soft);
+    white-space: nowrap;
+    transition: color .3s var(--ease), border-color .3s var(--ease);
+}
+.status-chip.rec { color: var(--amber); border-color: rgba(184, 146, 74, 0.5); }
+.status-chip.ok { color: var(--moss); border-color: rgba(92, 128, 82, 0.5); }
 .caret { display: inline-block; width: 7px; height: 1.05em; background: var(--moss); vertical-align: text-bottom; animation: blink 1.05s steps(2) infinite; }
 @keyframes blink { 50% { opacity: 0; } }
 
@@ -214,11 +221,12 @@ h1.title {
 /* Mounted specimen photo */
 .specimen {
     position: relative;
-    transform: rotate(-1.6deg);
+    --rot: -1.6deg; --py: 0px; --sc: 1;
+    transform: translateY(var(--py)) rotate(var(--rot)) scale(var(--sc));
     transition: transform .5s var(--ease);
     will-change: transform;
 }
-.specimen:hover { transform: rotate(0deg) scale(1.012); }
+.specimen:hover { --rot: 0deg; --sc: 1.012; }
 .specimen .mount {
     border: 1px solid var(--hairline);
     padding: 12px;
@@ -342,22 +350,51 @@ h2.plate-h em { font-style: italic; }
 .colophon .links { display: flex; gap: 1.6rem; justify-content: center; flex-wrap: wrap; font-size: 0.98rem; }
 .colophon .fine { margin-top: 1rem; font-size: 0.85rem; color: var(--ink-faint); font-style: italic; }
 
+/* Small mounted figures on plates II–IV */
+.fig-mount {
+    position: absolute; z-index: 1;
+    width: clamp(170px, 17vw, 250px);
+    --rot: 0deg; --py: 0px; --sc: 1;
+    transform: translateY(var(--py)) rotate(var(--rot)) scale(var(--sc));
+    transition: transform .5s var(--ease);
+    will-change: transform;
+}
+.fig-mount:hover { --sc: 1.02; }
+.fig-mount .mount {
+    border: 1px solid var(--hairline);
+    padding: 9px;
+    background: #FFFDF7;
+    box-shadow: 0 10px 26px rgba(26, 38, 34, 0.16), 0 2px 8px rgba(26, 38, 34, 0.09);
+}
+.fig-mount img { display: block; width: 100%; height: auto; filter: sepia(0.06); }
+.fig-mount .fig { margin-top: 7px; text-align: center; font-style: italic; font-size: 0.78rem; color: var(--ink-soft); }
+.fig-mount .tape {
+    position: absolute; width: 64px; height: 20px; top: -9px;
+    background: rgba(212, 200, 165, 0.55);
+    border-left: 1px dashed rgba(26,38,34,0.12); border-right: 1px dashed rgba(26,38,34,0.12);
+    z-index: 2;
+}
+.fig-mount .tape.l { left: 10%; transform: rotate(-5deg); }
+.fig-mount .tape.r { right: 8%; transform: rotate(4deg); }
+.plate-2 .fig-mount { right: 5%; bottom: 6%; --rot: 2.2deg; }
+.plate-3 .fig-mount { right: 5%; bottom: 5%; --rot: -2deg; }
+.plate-4 .fig-mount { left: 4%; bottom: 10%; width: clamp(140px, 13vw, 190px); --rot: -2.4deg; }
+
 /* Faint engraved bird watermark behind plates II-IV */
 .watermark {
     position: absolute; z-index: 0; pointer-events: none;
     width: 56vmin; opacity: 0.05;
     filter: grayscale(1) contrast(1.3);
 }
-.plate-2 .watermark { right: -6vmin; bottom: -4vmin; transform: rotate(6deg); }
-.plate-3 .watermark { left: -8vmin; top: 4vmin; transform: rotate(-8deg) scaleX(-1); }
-.plate-4 .watermark { right: 50%; bottom: -10vmin; transform: translateX(50%); width: 70vmin; opacity: 0.04; }
+.watermark { --py: 0px; }
+.plate-4 .watermark { right: 50%; bottom: -10vmin; transform: translateX(50%) translateY(var(--py)); width: 70vmin; opacity: 0.04; }
 .plate-z { position: relative; z-index: 2; }
 
 @media (max-width: 880px) {
     section.plate { padding: 4.2rem 1.4rem 3rem; height: auto; min-height: 100vh; }
     .hero-grid, .tax { grid-template-columns: 1fr; gap: 2rem; }
     .specimen { max-width: 420px; margin: 0 auto; }
-    .marginalia, .plate-frame { display: none; }
+    .marginalia, .plate-frame, .fig-mount { display: none; }
     .masthead { left: 1.2rem; right: 1.2rem; }
     .numerals { right: 10px; }
     .terminal { display: none; }
@@ -388,10 +425,10 @@ h2.plate-h em { font-style: italic; }
 </header>
 
 <nav class="numerals" aria-label="Plates">
-    <button class="numeral active" data-target="0">I</button>
-    <button class="numeral" data-target="1">II</button>
-    <button class="numeral" data-target="2">III</button>
-    <button class="numeral" data-target="3">IV</button>
+    <button class="numeral active" data-target="0" aria-label="Plate I"></button>
+    <button class="numeral" data-target="1" aria-label="Plate II"></button>
+    <button class="numeral" data-target="2" aria-label="Plate III"></button>
+    <button class="numeral" data-target="3" aria-label="Plate IV"></button>
 </nav>
 
 <main class="pages" id="pages">
@@ -414,7 +451,7 @@ h2.plate-h em { font-style: italic; }
                     <canvas id="sono" width="1200" height="220"></canvas>
                     <div class="axis"><span>0.0s</span><span>field recording — nightingale song, transcribed below</span><span>6.0s</span></div>
                 </div>
-                <p class="transcription reveal d3"><span class="prompt">&gt;</span> <span id="trans"></span><span class="caret"></span></p>
+                <p class="transcription reveal d3"><span class="status-chip" id="chip">idle</span><span><span class="prompt">&gt;</span> <span id="trans"></span><span class="caret"></span></span></p>
                 <div class="cta-row reveal d4">
                     <button class="cta" data-jump="1">Acquire the specimen</button>
                     <a class="cta ghost" href="https://github.com/ShatilKhan/knightingale">View source</a>
@@ -436,8 +473,12 @@ h2.plate-h em { font-style: italic; }
     <!-- ============ PLATE II ============ -->
     <section class="plate plate-2" id="plate-2">
         <div class="plate-label">Plate II · Acquisition</div>
-        <img class="watermark" src="brand/2-mark.png" alt="" data-parallax="0.15">
         <span class="marginalia left">habitat: linux · windows · macos</span>
+        <figure class="fig-mount" data-parallax="0.22">
+            <span class="tape l"></span><span class="tape r"></span>
+            <div class="mount"><img src="img/section-2.jpg" alt="Nightingale standing on stone, duotone plate"></div>
+            <figcaption class="fig">fig. 2 — <em>surveys new territory.</em></figcaption>
+        </figure>
         <div class="acq plate-z">
             <h2 class="plate-h reveal">One command. <em>No clone, no compile.</em></h2>
             <p class="lead reveal d1">Prebuilt binaries for every habitat. Checksums signed with sigstore. The daemon weighs 15–30&nbsp;MB and sleeps at 10–40&nbsp;MB resident.</p>
@@ -471,8 +512,12 @@ h2.plate-h em { font-style: italic; }
     <!-- ============ PLATE III ============ -->
     <section class="plate plate-3" id="plate-3">
         <div class="plate-label">Plate III · Taxonomy of Providers</div>
-        <img class="watermark" src="brand/2-mark.png" alt="" data-parallax="0.15">
         <span class="marginalia left">one http shape · /v1/audio/transcriptions</span>
+        <figure class="fig-mount" data-parallax="0.2">
+            <span class="tape l"></span><span class="tape r"></span>
+            <div class="mount"><img src="img/section-3.jpg" alt="Nightingale singing, beak open, duotone plate"></div>
+            <figcaption class="fig">fig. 3 — <em>in full song.</em></figcaption>
+        </figure>
         <div class="tax plate-z">
             <div>
                 <h2 class="plate-h reveal">Nine species, <em>one genus.</em></h2>
@@ -506,6 +551,11 @@ h2.plate-h em { font-style: italic; }
     <section class="plate plate-4" id="plate-4">
         <div class="plate-label">Plate IV · The Collector's Oath</div>
         <img class="watermark" src="brand/2-mark.png" alt="" data-parallax="0.1">
+        <figure class="fig-mount" data-parallax="0.18">
+            <span class="tape l"></span><span class="tape r"></span>
+            <div class="mount"><img src="img/section-4.jpg" alt="Nightingale perched on mossy branch, duotone plate"></div>
+            <figcaption class="fig">fig. 4 — <em>keeps its perch, and its counsel.</em></figcaption>
+        </figure>
         <div class="oath-wrap plate-z">
             <p class="oath reveal"><span class="drop">“</span>No telemetry of any kind. No metrics, no analytics, no phone-home. Audio is sent <strong>only</strong> to the endpoint you configured, with your key, and nowhere else.<span class="drop">”</span></p>
             <p class="oath-note reveal d1">— sworn in the source; grep it for <code class="mono" style="font-style:normal;font-size:0.85em">reqwest</code> and count one client.</p>
@@ -558,8 +608,7 @@ if (!reduced) {
                 if (Math.abs(off) <= vh) {
                     p.querySelectorAll('[data-parallax]').forEach(el => {
                         const f = parseFloat(el.dataset.parallax);
-                        const base = el.classList.contains('specimen') ? ' rotate(-1.6deg)' : '';
-                        el.style.transform = `translateY(${off * f}px)` + base;
+                        el.style.setProperty('--py', `${off * f}px`);
                     });
                 }
             });
@@ -588,15 +637,24 @@ document.querySelectorAll('.copy-btn').forEach(btn => {
     });
 });
 
-/* ============ Sonogram: ink chirps on paper ============ */
+/* ============ Hero: one synchronized dictation cycle ============
+   record (chirps burst) → transcribing… → transcript types → ✓ done → repeat */
 const sono = document.getElementById('sono');
 const sctx = sono.getContext('2d');
 const W = sono.width, H = sono.height;
 const ink = 'rgba(31, 58, 42, 0.85)';
-let marks = [];      // {x, y, len, arc, w}
-let tNext = 0;
+const trans = document.getElementById('trans');
+const chip = document.getElementById('chip');
+const lines = [
+    'voice dictation that minds its own business.',
+    'tap the hotkey. speak. it types. that’s the whole song.',
+    'no telemetry — the bird keeps your secrets.',
+];
+let marks = [];
+let singing = false;
+let tNextPhrase = 0;
+
 function spawnPhrase() {
-    // A nightingale phrase: 3–9 rapid chirps in a frequency band, then silence.
     const n = 3 + Math.floor(Math.random() * 7);
     const band = 30 + Math.random() * (H - 90);
     let x = W + 10;
@@ -626,9 +684,9 @@ function tickSono(ts) {
     if (!reduced) {
         marks.forEach(m => m.x -= 1.6);
         marks = marks.filter(m => m.x + m.len > -20);
-        if (ts > tNext) {
+        if (singing && ts > tNextPhrase) {
             spawnPhrase();
-            tNext = ts + 900 + Math.random() * 1800;   // song … pause … song
+            tNextPhrase = ts + 500 + Math.random() * 800;
         }
         drawSono();
     }
@@ -637,34 +695,43 @@ function tickSono(ts) {
 spawnPhrase(); drawSono();
 requestAnimationFrame(tickSono);
 
-/* Transcription typewriter under the sonogram */
-const trans = document.getElementById('trans');
-const lines = [
-    'voice dictation that minds its own business.',
-    'tap the hotkey. speak. it types. that’s the whole song.',
-    'no telemetry — the bird keeps your secrets.',
-];
-let li = 0;
-function typeLine(text, i, done) {
-    if (reduced) { trans.textContent = text; return; }
-    if (i > text.length) { setTimeout(done, 2600); return; }
+function setChip(label, cls) {
+    chip.textContent = label;
+    chip.className = 'status-chip' + (cls ? ' ' + cls : '');
+}
+function typeOut(text, i, done) {
+    if (i > text.length) { done(); return; }
     trans.textContent = text.slice(0, i);
-    setTimeout(() => typeLine(text, i + 1, done), 34 + Math.random() * 30);
+    setTimeout(() => typeOut(text, i + 1, done), 30 + Math.random() * 28);
 }
-function nextLine() {
-    typeLine(lines[li % lines.length], 0, () => {
-        // erase quickly
-        const t = lines[li % lines.length];
-        let j = t.length;
-        const erase = () => {
-            if (j < 0) { li++; setTimeout(nextLine, 350); return; }
-            trans.textContent = t.slice(0, j--);
-            setTimeout(erase, 9);
-        };
-        erase();
-    });
+let li = 0;
+function dictationCycle() {
+    if (reduced) {
+        setChip('✓ done', 'ok');
+        trans.textContent = lines[0];
+        return;
+    }
+    // 1. record: the bird sings
+    setChip('● recording', 'rec');
+    trans.textContent = '';
+    singing = true;
+    setTimeout(() => {
+        // 2. transcribing: song stops, daemon thinks
+        singing = false;
+        setChip('◌ transcribing…', '');
+        setTimeout(() => {
+            // 3. transcript types out
+            setChip('✎ typing', 'ok');
+            typeOut(lines[li % lines.length], 0, () => {
+                // 4. done — hold, then loop
+                setChip('✓ done', 'ok');
+                li++;
+                setTimeout(dictationCycle, 3200);
+            });
+        }, 850);
+    }, 2400);
 }
-nextLine();
+dictationCycle();
 
 /* Field-recorder demo */
 const cmdEl = document.getElementById('termCmd');
